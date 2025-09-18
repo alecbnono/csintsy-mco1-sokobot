@@ -8,4 +8,17 @@ public class GameState {
      * 3. Goal Position as well with Hashset uniqueness
      * 4. Char move. ex: up = u, down = d, left = l, right = r
      */
+
+    private Point player;
+    private Point[] boxLocations;
+
+    public GameState(int boxCount) {
+        this.boxLocations = new Point[boxCount];
+    }
+
+    public String validMoves() {
+
+        return "";
+    }
+
 }

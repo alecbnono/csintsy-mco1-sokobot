@@ -1,3 +1,3 @@
 del /s /q *.class
-javac src/main/Driver.java -cp src
-java -classpath src main.Driver %1 fp
+javac src/Driver.java -cp src
+java -classpath src Driver %1 fp
