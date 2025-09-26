@@ -1,5 +1,7 @@
 package solver;
 
+import java.util.HashSet;
+
 public class GameState {
     /*
      * States Needed for the Game State:
@@ -9,11 +11,16 @@ public class GameState {
      * 4. Char move. ex: up = u, down = d, left = l, right = r
      */
 
-    private Point player;
-    private Point[] boxLocations;
+    private Point playerPosition;
+    private HashSet<Point> boxPosition;
+    private HashSet<Point> goalPosition;
+    private char validMove;
 
-    public GameState(int boxCount) {
-        this.boxLocations = new Point[boxCount];
+    public GameState(Point playerPosition, HashSet<Point> boxPosition, HashSet<Point> goalPosition, char validMove) {
+        this.playerPosition = playerPosition;
+        this.boxPosition = boxPosition;
+        this.goalPosition = goalPosition;
+        this.validMove = validMove;
     }
 
     public String validMoves() {
