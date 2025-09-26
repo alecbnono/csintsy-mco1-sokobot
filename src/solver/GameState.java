@@ -1,5 +1,7 @@
 package solver;
 
+import java.util.HashSet;
+
 public class GameState {
     /*
      * States Needed for the Game State:
@@ -9,16 +11,45 @@ public class GameState {
      * 4. Char move. ex: up = u, down = d, left = l, right = r
      */
 
+    // dynamic variables
     private Point player;
-    private Point[] boxLocations;
+    private HashSet<Point> boxLocations;
 
-    public GameState(int boxCount) {
-        this.boxLocations = new Point[boxCount];
+    public GameState(Point player, HashSet<Point> boxLocations) {
+        this.player = player;
+        this.boxLocations = boxLocations;
     }
 
-    public String validMoves() {
+    public Point getPlayer() {
+        return player;
+    }
 
-        return "";
+    public HashSet<Point> getBoxLocations() {
+        return boxLocations;
+    }
+
+    public boolean isValidAction(char direction) {
+
+    }
+
+    public String validActions() {
+
+        // Start out with 4 moves (up, down, left, right)
+        //
+        // Check if already explored based on coords
+        // (use hashmap to stored visited states)
+        //
+        // Check validity of action
+        //
+        // 1. Do I move into a wall? POP IF YES
+        // 2. Do I push a box? -> Is the box infront of a wall or another box? POP IF
+        // YES
+        // If NO to both questions -> VALID ACTION
+
+    }
+
+    public boolean isGoalState() {
+
     }
 
 }

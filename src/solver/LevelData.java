@@ -1,49 +1,51 @@
 package solver;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 public class LevelData {
 
-    // Raw data
-    private char[][] mapData;
-    private int width;
-    private int height;
-
     // Converted data to be more memory effecient
-    private int boxCount;
-    private Point playerOrigin;
-    private Point[] boxesOrigin;
+    private HashSet<Point> walls;
+    private HashSet<Point> targets;
 
-    public LevelData(int width, int height, char[][] mapData) {
+    private GameState origin;
 
-        this.mapData = mapData;
-        this.width = width;
-        this.height = height;
+    public LevelData(int width, int height, char[][] mapData, char[][] itemsData) {
 
-        this.boxCount = 0;
-
-        // temporary storage for box coords
-        ArrayList<Point> tempBoxPoints = new ArrayList<Point>();
-
-        // searches through map for relative states; converts to Points
+        // searches through map for constants; converts to Points
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                // Sets coords if a box has been found; adds to count
-                if (this.mapData[height][width] == '$') {
-                    this.boxCount++;
-                    tempBoxPoints.add(new Point(width, height));
+                // adds wall point to hashset
+                if (mapData[height][width] == '#') {
+                    walls.add(new Point(width, height));
                 }
-                // Sets coords for player origin if found
-                else if (this.mapData[height][width] == '@') {
-                    playerOrigin = new Point(width, height);
+                // adds target point to hashset
+                else if (mapData[height][width] == '.') {
+                    targets.add(new Point(width, height));
                 }
             }
         }
 
-        // Copies the ArrayList into an Array
-        boxesOrigin = tempBoxPoints.toArray(new Point[boxCount]);
+        // temporary storage for box coords
+        HashSet<Point> tempBoxPoints = new HashSet<Point>();
+        Point tempPlayer = null;
 
-        // This is needed because Arrays have less
-        // memory overhead compared to ArrayLists
+        // searches through map for relevant states; converts to Points
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                // Sets coords if a box has been found; adds to count
+                if (mapData[height][width] == '$') {
+                    tempBoxPoints.add(new Point(width, height));
+                }
+                // Sets coords for player origin if found
+                else if (mapData[height][width] == '@') {
+                    tempPlayer = new Point(width, height);
+                }
+            }
+        }
+
+        // Initialize origin state
+        origin = new GameState(tempPlayer, tempBoxPoints);
     }
+
 }
