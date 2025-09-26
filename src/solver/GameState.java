@@ -63,4 +63,23 @@ public class GameState {
         return playerPosition;
     }
 
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(playerPosition, boxPosition, goalPosition);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!(obj instanceof GameState))
+            return false;
+
+        GameState other = (GameState) obj;
+
+        return playerPosition.equals(other.playerPosition) && boxPosition.equals(other.boxPosition)
+                && goalPosition.equals(other.goalPosition);
+
+    }
+
 }
