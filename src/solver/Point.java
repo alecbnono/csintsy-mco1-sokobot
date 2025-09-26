@@ -28,12 +28,27 @@ public class Point {
             case 'r':
                 return new Point(this.x + 1, this.y);
             default:
-                return null;
+                throw new IllegalArgumentException("Invalid direction: " + direction);
         }
     }
 
     @Override
+    public int hashCode() {
+        return 997 * x + y;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true; // same reference
+        if (obj == null || getClass() != obj.getClass())
+            return false; // null or diff type
+        Point other = (Point) obj;
+        return this.x == other.x && this.y == other.y; // compare fields
+    }
+
+    @Override
     public String toString() {
-        return "(" + x + ")" + " " + "(" + y + ")";
+        return "(" + x + ", " + y + ")";
     }
 }
