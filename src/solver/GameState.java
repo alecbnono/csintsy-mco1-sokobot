@@ -28,4 +28,12 @@ public class GameState {
         return "";
     }
 
+    public char getValidMode() {
+        return validMove;
+    }
+
+    public Point getPlayerPosition() {
+        return playerPosition;
+    }
+
 }
