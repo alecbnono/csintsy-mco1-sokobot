@@ -11,13 +11,16 @@ public class GameState {
      * 4. Char move. ex: up = u, down = d, left = l, right = r
      */
 
-    // dynamic variables
-    private Point player;
-    private HashSet<Point> boxLocations;
+    private Point playerPosition;
+    private HashSet<Point> boxPosition;
+    private HashSet<Point> goalPosition;
+    private char validMove;
 
-    public GameState(Point player, HashSet<Point> boxLocations) {
-        this.player = player;
-        this.boxLocations = boxLocations;
+    public GameState(Point playerPosition, HashSet<Point> boxPosition, HashSet<Point> goalPosition, char validMove) {
+        this.playerPosition = playerPosition;
+        this.boxPosition = boxPosition;
+        this.goalPosition = goalPosition;
+        this.validMove = validMove;
     }
 
     public Point getPlayer() {
@@ -50,6 +53,14 @@ public class GameState {
 
     public boolean isGoalState() {
 
+    }
+
+    public char getValidMode() {
+        return validMove;
+    }
+
+    public Point getPlayerPosition() {
+        return playerPosition;
     }
 
 }
