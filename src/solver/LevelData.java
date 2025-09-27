@@ -48,4 +48,12 @@ public class LevelData {
         origin = new GameState(tempPlayer, tempBoxPoints);
     }
 
+    public HashSet getWalls() {
+        return walls;
+    }
+
+    public HashSet getTargets() {
+        return targets;
+    }
+
 }

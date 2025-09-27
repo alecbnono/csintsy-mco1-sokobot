@@ -14,13 +14,13 @@ public class GameState {
     private Point playerPosition;
     private HashSet<Point> boxPosition;
     private HashSet<Point> goalPosition;
-    private char validMove;
+    private LevelData level;
 
-    public GameState(Point playerPosition, HashSet<Point> boxPosition, HashSet<Point> goalPosition, char validMove) {
+    public GameState(Point playerPosition, HashSet<Point> boxPosition, HashSet<Point> goalPosition, LevelData level) {
         this.playerPosition = playerPosition;
         this.boxPosition = boxPosition;
         this.goalPosition = goalPosition;
-        this.validMove = validMove;
+        this.level = level;
     }
 
     public Point getPlayer() {
@@ -32,6 +32,28 @@ public class GameState {
     }
 
     public boolean isValidAction(char direction) {
+
+        // sets relevant points to the direction from param
+        Point nextPoint = playerPosition.pointAtMove(direction);
+        Point nextNextPoint = nextPoint.pointAtMove(direction);
+
+        // check if adjacent point is wall
+        if (level.getWalls().contains(nextPoint)) {
+            return false;
+        }
+        // checks if next move pushes a box
+        else if (boxPosition.contains(nextPoint)) {
+
+            // checks if next next box is an obstacle (wall or box)
+            if (level.getWalls().contains(nextNextPoint) || boxPosition.contains(nextNextPoint)) {
+                return false;
+            }
+
+        }
+        // otherwise, its a valid move
+        else {
+            return true;
+        }
 
     }
 
