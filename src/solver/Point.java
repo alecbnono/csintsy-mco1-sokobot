@@ -19,16 +19,19 @@ public class Point {
     public Point pointAtMove(char direction) {
 
         switch (direction) {
-            case 'u':
+            case 'u' -> {
                 return new Point(this.x, this.y - 1);
-            case 'd':
+            }
+            case 'd' -> {
                 return new Point(this.x, this.y + 1);
-            case 'l':
+            }
+            case 'l' -> {
                 return new Point(this.x - 1, this.y);
-            case 'r':
+            }
+            case 'r' -> {
                 return new Point(this.x + 1, this.y);
-            default:
-                throw new IllegalArgumentException("Invalid direction: " + direction);
+            }
+            default -> throw new IllegalArgumentException("Invalid direction: " + direction);
         }
     }
 
