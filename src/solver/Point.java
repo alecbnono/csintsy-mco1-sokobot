@@ -20,9 +20,9 @@ public class Point {
 
         switch (direction) {
             case 'u':
-                return new Point(this.x, this.y + 1);
-            case 'd':
                 return new Point(this.x, this.y - 1);
+            case 'd':
+                return new Point(this.x, this.y + 1);
             case 'l':
                 return new Point(this.x - 1, this.y);
             case 'r':
@@ -34,7 +34,7 @@ public class Point {
 
     @Override
     public int hashCode() {
-        return 997 * x + y;
+        return 31 * x + y; // produces fewer collisions
     }
 
     @Override
