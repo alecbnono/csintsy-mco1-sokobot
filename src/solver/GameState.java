@@ -3,6 +3,9 @@ package solver;
 import java.util.HashSet;
 
 public class GameState {
+
+    public static int MAX_MOVES = 4;
+
     /*
      * States Needed for the Game State:
      * 1. Player Position using Point probably use a class for points
@@ -13,24 +16,28 @@ public class GameState {
 
     private Point playerPosition;
     private HashSet<Point> boxPosition;
-    private HashSet<Point> goalPosition;
     private LevelData level;
 
-    public GameState(Point playerPosition, HashSet<Point> boxPosition, HashSet<Point> goalPosition, LevelData level) {
+    public GameState(Point playerPosition, HashSet<Point> boxPosition, LevelData level) {
         this.playerPosition = playerPosition;
         this.boxPosition = boxPosition;
-        this.goalPosition = goalPosition;
-        this.level = level;
+        this.level = level; // this reference gives access to the entire level
     }
 
     public Point getPlayer() {
-        return player;
+        return playerPosition;
     }
 
-    public HashSet<Point> getBoxLocations() {
-        return boxLocations;
+    public HashSet<Point> getBoxPosition() {
+        return boxPosition;
     }
 
+    // Check validity of action
+    //
+    // 1. Do I move into a wall? POP IF YES
+    // 2. Do I push a box? -> Is the box infront of a wall or another box? POP IF
+    // YES
+    // If NO to both questions -> VALID ACTION
     public boolean isValidAction(char direction) {
 
         // sets relevant points to the direction from param
@@ -48,6 +55,7 @@ public class GameState {
             if (level.getWalls().contains(nextNextPoint) || boxPosition.contains(nextNextPoint)) {
                 return false;
             }
+            return true;
 
         }
         // otherwise, its a valid move
@@ -57,28 +65,53 @@ public class GameState {
 
     }
 
-    public String validActions() {
+    public GameState generateState(char direction) {
+
+        // replace player position
+        Point nextPlayerPoint = playerPosition.pointAtMove(direction);
+
+        // check if valid action
+        if (isValidAction(direction)) {
+
+            // if state will push box
+            if (boxPosition.contains(nextPlayerPoint)) {
+
+                // replace with new box position
+
+                HashSet<Point> newBoxPosition = new HashSet<Point>(boxPosition); // clones box positions
+
+                newBoxPosition.remove(nextPlayerPoint); // remove relevant box
+                newBoxPosition.add(nextPlayerPoint.pointAtMove(direction)); // adds moved box
+
+                return new GameState(nextPlayerPoint, newBoxPosition, level);
+            }
+            // no box will be pushed
+            else {
+                return new GameState(nextPlayerPoint, boxPosition, level);
+            }
+        } else {
+            throw new IllegalArgumentException("(State cannot be generated) Invalid direction : " + direction);
+        }
+
+    }
+
+    // TODO: Generate children states
+    public GameState[] getNextStates() {
+
+        char[] moves = { 'u', 'd', 'l', 'r' };
+        char[] validMoves = new char[MAX_MOVES];
+
+        // filter invalid moves
+        for (int i = 0; i < MAX_MOVES; i++) {
+
+            isValidAction(moves[i]);
+        }
 
         // Start out with 4 moves (up, down, left, right)
         //
         // Check if already explored based on coords
         // (use hashmap to stored visited states)
         //
-        // Check validity of action
-        //
-        // 1. Do I move into a wall? POP IF YES
-        // 2. Do I push a box? -> Is the box infront of a wall or another box? POP IF
-        // YES
-        // If NO to both questions -> VALID ACTION
-
-    }
-
-    public boolean isGoalState() {
-
-    }
-
-    public char getValidMode() {
-        return validMove;
     }
 
     public Point getPlayerPosition() {
@@ -87,7 +120,7 @@ public class GameState {
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(playerPosition, boxPosition, goalPosition);
+        return java.util.Objects.hash(playerPosition, boxPosition);
     }
 
     @Override
@@ -99,8 +132,7 @@ public class GameState {
 
         GameState other = (GameState) obj;
 
-        return playerPosition.equals(other.playerPosition) && boxPosition.equals(other.boxPosition)
-                && goalPosition.equals(other.goalPosition);
+        return playerPosition.equals(other.playerPosition) && boxPosition.equals(other.boxPosition);
 
     }
 

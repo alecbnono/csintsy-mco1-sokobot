@@ -6,7 +6,7 @@ public class LevelData {
 
     // Converted data to be more memory effecient
     private HashSet<Point> walls;
-    private HashSet<Point> targets;
+    private HashSet<Point> targets; // use this to check for goal state
 
     private GameState origin;
 
@@ -45,7 +45,7 @@ public class LevelData {
         }
 
         // Initialize origin state
-        origin = new GameState(tempPlayer, tempBoxPoints);
+        origin = new GameState(tempPlayer, tempBoxPoints, this);
     }
 
     public HashSet getWalls() {
