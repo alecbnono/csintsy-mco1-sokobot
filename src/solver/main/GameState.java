@@ -96,7 +96,6 @@ public class GameState {
 
     }
 
-    // TODO: Generate children states
     public ArrayList<GameState> getNextStates() {
         char[] moves = { 'u', 'd', 'l', 'r' };
 
