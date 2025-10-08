@@ -28,7 +28,7 @@ public class GreedyBestFirstSearch {
         while (!frontier.isEmpty()) {
             GameState current = frontier.poll();
 
-            if (isGoalState(startState, targetPoints)) {
+            if (isGoalState(current, targetPoints)) {
                 return reconstructPath(cameFrom, current);
             }
 

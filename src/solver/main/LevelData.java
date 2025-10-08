@@ -19,33 +19,36 @@ public class LevelData {
         // searches through map for constants; converts to Points
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                // adds wall point to hashset
+
+                // Walls and targets from mapData
                 if (mapData[i][j] == '#') {
                     walls.add(new Point(j, i));
                 }
-                // adds target point to hashset
                 if (mapData[i][j] == '.') {
                     targets.add(new Point(j, i));
                 }
 
-                // Sets coords if a box has been found; adds to count
-                if (mapData[i][j] == '$') {
+                // Boxes and player may appear in itemsData
+                char item = itemsData[i][j];
+                if (item == '$') {
                     tempBoxPoints.add(new Point(j, i));
                 }
-
-                // Sets coords for player origin if found
-                if (mapData[i][j] == '@') {
+                if (item == '@') {
                     tempPlayer = new Point(j, i);
                 }
             }
         }
 
         // Initialize origin state
-        origin = new GameState(tempPlayer, tempBoxPoints, this);
+        this.origin = new GameState(tempPlayer, tempBoxPoints, this);
     }
 
     public HashSet<Point> getWalls() {
         return walls;
+    }
+
+    public GameState getOrigin() {
+        return this.origin;
     }
 
     public HashSet<Point> getTargets() {

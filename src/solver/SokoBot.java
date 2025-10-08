@@ -1,23 +1,40 @@
 package solver;
 
+import java.util.List;
+
+import solver.heuristics.Heuristics;
+import solver.main.GameState;
+import solver.main.LevelData;
+import solver.searchAlgorithms.GreedyBestFirstSearch;
+
 public class SokoBot {
 
     public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
-        /*
-         * YOU NEED TO REWRITE THE IMPLEMENTATION OF THIS METHOD TO MAKE THE BOT SMARTER
-         */
-        /*
-         * Default stupid behavior: Think (sleep) for 3 seconds, and then return a
-         * sequence
-         * that just moves left and right repeatedly.
-         */
+        LevelData level = new LevelData(width, height, mapData, itemsData);
 
-        try {
-            Thread.sleep(3000);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        Heuristics heuristics = new Heuristics();
+
+        GameState startState = level.getOrigin();
+
+        List<GameState> solution = GreedyBestFirstSearch.GBFS(startState, heuristics, level.getTargets(),
+                level.getWalls());
+
+        StringBuilder moves = new StringBuilder();
+        for (int i = 1; i < solution.size(); i++) {
+            GameState prev = solution.get(i - 1);
+            GameState curr = solution.get(i);
+
+            char move = curr.getMoveMadeFrom(prev);
+
+            moves.append(move);
         }
-        return "lrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlr";
+
+        if (solution.isEmpty()) {
+            return "No solution found.";
+        }
+
+        return moves.toString();
+
     }
 
 }
