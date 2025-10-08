@@ -1,10 +1,11 @@
-package solver;
+package solver.main;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class GameState {
 
-    public static int MAX_MOVES = 4;
+    public static final int MAX_MOVES = 4;
 
     /*
      * States Needed for the Game State:
@@ -20,7 +21,7 @@ public class GameState {
 
     public GameState(Point playerPosition, HashSet<Point> boxPosition, LevelData level) {
         this.playerPosition = playerPosition;
-        this.boxPosition = boxPosition;
+        this.boxPosition = new HashSet<>(boxPosition);
         this.level = level; // this reference gives access to the entire level
     }
 
@@ -29,7 +30,7 @@ public class GameState {
     }
 
     public HashSet<Point> getBoxPosition() {
-        return boxPosition;
+        return new HashSet<>(boxPosition);
     }
 
     // Check validity of action
@@ -96,22 +97,17 @@ public class GameState {
     }
 
     // TODO: Generate children states
-    public GameState[] getNextStates() {
-
+    public ArrayList<GameState> getNextStates() {
         char[] moves = { 'u', 'd', 'l', 'r' };
-        char[] validMoves = new char[MAX_MOVES];
 
-        // filter invalid moves
-        for (int i = 0; i < MAX_MOVES; i++) {
+        ArrayList<GameState> nextGameStates = new ArrayList<>();
 
-            isValidAction(moves[i]);
+        for (char move : moves) {
+            if (isValidAction(move)) {
+                nextGameStates.add(generateState(move));
+            }
         }
-
-        // Start out with 4 moves (up, down, left, right)
-        //
-        // Check if already explored based on coords
-        // (use hashmap to stored visited states)
-        //
+        return nextGameStates;
     }
 
     public Point getPlayerPosition() {
@@ -134,6 +130,11 @@ public class GameState {
 
         return playerPosition.equals(other.playerPosition) && boxPosition.equals(other.boxPosition);
 
+    }
+
+    @Override
+    public String toString() {
+        return "Player=" + playerPosition + ", Boxes =" + boxPosition;
     }
 
 }

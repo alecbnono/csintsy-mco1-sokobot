@@ -2,7 +2,7 @@ package solver.heuristics;
 
 import java.util.HashSet;
 
-import solver.Point;
+import solver.main.Point;
 
 public class Heuristics {
 

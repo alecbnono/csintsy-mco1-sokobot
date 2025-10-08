@@ -1,4 +1,4 @@
-package solver;
+package solver.main;
 
 public class Point {
     private int x, y;

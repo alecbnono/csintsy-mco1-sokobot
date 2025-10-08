@@ -1,4 +1,4 @@
-package solver;
+package solver.main;
 
 import java.util.HashSet;
 
