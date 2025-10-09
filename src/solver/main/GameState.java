@@ -6,6 +6,7 @@ import java.util.HashSet;
 public class GameState {
 
     public static final int MAX_MOVES = 4;
+    private final int cachedHashCode;
 
     private Point playerPosition;
     private HashSet<Point> boxPosition;
@@ -18,6 +19,7 @@ public class GameState {
         this.boxPosition = new HashSet<>(boxPosition);
         this.level = level;
         this.move = move;
+        this.cachedHashCode = java.util.Objects.hash(playerPosition, boxPosition);
     }
 
     // Constructor for origin (no move)
@@ -26,11 +28,11 @@ public class GameState {
     }
 
     public Point getPlayer() {
-        return playerPosition;
+        return this.playerPosition;
     }
 
     public HashSet<Point> getBoxPosition() {
-        return new HashSet<>(boxPosition);
+        return this.boxPosition;
     }
 
     public boolean isValidAction(char direction) {
@@ -87,7 +89,7 @@ public class GameState {
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(playerPosition, boxPosition);
+        return cachedHashCode;
     }
 
     @Override

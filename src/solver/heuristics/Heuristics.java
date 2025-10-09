@@ -77,8 +77,8 @@ public class Heuristics {
     }
 
     public int getStateHeuristic(HashSet<Point> boxes, HashSet<Point> targets, HashSet<Point> walls) {
-        int distanceHeuristic = totalManhattan(boxes, targets);
-        boolean deadlockExists = isStateDeadlock(boxes, targets, walls);
+        int distanceHeuristic = this.totalManhattan(boxes, targets);
+        boolean deadlockExists = this.isStateDeadlock(boxes, targets, walls);
 
         if (deadlockExists) {
             return 999999999;

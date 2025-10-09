@@ -14,10 +14,12 @@ import solver.main.GameState;
 import solver.main.Point;
 
 public class GreedyBestFirstSearch {
-    public static List<GameState> GBFS(GameState startState, Heuristics heuristics, HashSet<Point> targetPoints,
+    public static List<GameState> GBFS(GameState startState, HashSet<Point> targetPoints,
             HashSet<Point> wallPoints) {
+        Heuristics heuristics = new Heuristics();
+
         PriorityQueue<GameState> frontier = new PriorityQueue<>(Comparator.comparingInt(
-                state -> getHeuristicValue(state, heuristics, targetPoints)));
+                state -> heuristics.getStateHeuristic(state.getBoxPosition(), targetPoints, wallPoints)));
 
         Set<GameState> visited = new HashSet<>();
         Map<GameState, GameState> cameFrom = new HashMap<>();
@@ -38,11 +40,8 @@ public class GreedyBestFirstSearch {
 
                 boolean deadlock = false;
 
-                for (Point box : neighbor.getBoxPosition()) {
-                    if (heuristics.isDeadlock(box, targetPoints, wallPoints)) {
-                        deadlock = true;
-                        break;
-                    }
+                if (heuristics.isStateDeadlock(neighbor.getBoxPosition(), targetPoints, wallPoints)) {
+                    continue;
                 }
 
                 if (deadlock)
@@ -55,22 +54,6 @@ public class GreedyBestFirstSearch {
         }
 
         return Collections.emptyList();
-    }
-
-    private static int getHeuristicValue(GameState state, Heuristics heuristics, HashSet<Point> targets) {
-        int total = 0;
-
-        for (Point box : state.getBoxPosition()) {
-            int minDist = Integer.MAX_VALUE;
-
-            for (Point target : targets) {
-                int dist = heuristics.getManhattan(box, target);
-                if (dist < minDist)
-                    minDist = dist;
-            }
-            total += minDist;
-        }
-        return total;
     }
 
     private static boolean isGoalState(GameState state, HashSet<Point> targets) {

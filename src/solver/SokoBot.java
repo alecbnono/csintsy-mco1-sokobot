@@ -1,7 +1,6 @@
 package solver;
 
 import java.util.List;
-
 import solver.heuristics.Heuristics;
 import solver.main.GameState;
 import solver.main.LevelData;
@@ -16,7 +15,7 @@ public class SokoBot {
 
         GameState startState = level.getOrigin();
 
-        List<GameState> solution = GreedyBestFirstSearch.GBFS(startState, heuristics, level.getTargets(),
+        List<GameState> solution = GreedyBestFirstSearch.GBFS(startState, level.getTargets(),
                 level.getWalls());
 
         StringBuilder moves = new StringBuilder();
