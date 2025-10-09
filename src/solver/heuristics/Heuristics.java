@@ -22,6 +22,29 @@ public class Heuristics {
         return differenceInX + differenceInY;
     }
 
+    public int minimumManhattan(Point position, HashSet<Point> targets) {
+        int minDistance = 0;
+        for (Point target : targets) {
+            int distance = getManhattan(position, target);
+
+            if (distance < minDistance) {
+                minDistance = distance;
+            }
+        }
+
+        return minDistance;
+    }
+
+    public int totalManhattan(HashSet<Point> boxes, HashSet<Point> targets) {
+        int total = 0;
+
+        for (Point box : boxes) {
+            total += minimumManhattan(box, targets);
+        }
+
+        return total;
+    }
+
     // deadlocks can be determined by checking if box is in a corner
     public boolean isDeadlock(Point position, HashSet<Point> targets, HashSet<Point> walls) {
 
@@ -43,4 +66,27 @@ public class Heuristics {
         return false;
 
     }
+
+    public boolean isStateDeadlock(HashSet<Point> boxes, HashSet<Point> targets, HashSet<Point> walls) {
+        for (Point box : boxes) {
+            if (isDeadlock(box, targets, walls)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public int getStateHeuristic(HashSet<Point> boxes, HashSet<Point> targets, HashSet<Point> walls) {
+        int distanceHeuristic = totalManhattan(boxes, targets);
+        boolean deadlockExists = isStateDeadlock(boxes, targets, walls);
+
+        if (deadlockExists) {
+            return 999999999;
+        }
+
+        return distanceHeuristic;
+
+    }
+
 }
