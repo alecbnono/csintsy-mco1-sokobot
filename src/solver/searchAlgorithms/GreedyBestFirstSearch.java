@@ -14,10 +14,13 @@ import solver.main.GameState;
 import solver.main.Point;
 
 public class GreedyBestFirstSearch {
+
     public static List<GameState> GBFS(GameState startState, HashSet<Point> targetPoints,
             HashSet<Point> wallPoints) {
+
         Heuristics heuristics = new Heuristics();
 
+        // PriorityQueue sorts by heuristic value
         PriorityQueue<GameState> frontier = new PriorityQueue<>(Comparator.comparingInt(
                 state -> heuristics.getStateHeuristic(state.getBoxPosition(), targetPoints, wallPoints)));
 
@@ -25,34 +28,38 @@ public class GreedyBestFirstSearch {
         Map<GameState, GameState> cameFrom = new HashMap<>();
 
         frontier.add(startState);
+
         while (!frontier.isEmpty()) {
             GameState current = frontier.poll();
 
+            // Skip if already visited
+            if (visited.contains(current))
+                continue;
+            visited.add(current);
+
+            // Check goal
             if (isGoalState(current, targetPoints)) {
                 return reconstructPath(cameFrom, current);
             }
 
-            visited.add(current);
-
+            // Explore neighbors
             for (GameState neighbor : current.getNextStates()) {
-                if (visited.contains(neighbor) || frontier.contains(neighbor))
+                if (visited.contains(neighbor))
                     continue;
 
-                boolean deadlock = false;
-
-                if (heuristics.isStateDeadlock(neighbor.getBoxPosition(), targetPoints, wallPoints)) {
+                // Skip deadlocked states
+                if (heuristics.isStateDeadlock(neighbor.getBoxPosition(), targetPoints, wallPoints))
                     continue;
+
+                // Only add to frontier if not already present
+                if (!frontier.contains(neighbor)) {
+                    frontier.add(neighbor);
+                    cameFrom.put(neighbor, current);
                 }
-
-                if (deadlock)
-                    continue;
-
-                cameFrom.put(neighbor, current);
-
-                frontier.add(neighbor);
             }
         }
 
+        // No solution found
         return Collections.emptyList();
     }
 
@@ -62,12 +69,10 @@ public class GreedyBestFirstSearch {
 
     private static List<GameState> reconstructPath(Map<GameState, GameState> cameFrom, GameState current) {
         List<GameState> path = new ArrayList<>();
-
         while (current != null) {
             path.add(current);
             current = cameFrom.get(current);
         }
-
         Collections.reverse(path);
         return path;
     }
