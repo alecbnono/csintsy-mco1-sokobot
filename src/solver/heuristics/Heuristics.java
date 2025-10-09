@@ -1,7 +1,6 @@
 package solver.heuristics;
 
 import java.util.HashSet;
-
 import solver.main.Point;
 
 public class Heuristics {
@@ -23,7 +22,7 @@ public class Heuristics {
     }
 
     public int minimumManhattan(Point position, HashSet<Point> targets) {
-        int minDistance = 0;
+        int minDistance = Integer.MAX_VALUE;
         for (Point target : targets) {
             int distance = getManhattan(position, target);
 

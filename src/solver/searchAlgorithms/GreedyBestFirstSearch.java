@@ -1,7 +1,6 @@
 package solver.searchAlgorithms;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -10,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-
 import solver.heuristics.Heuristics;
 import solver.main.GameState;
 import solver.main.Point;
@@ -35,7 +33,7 @@ public class GreedyBestFirstSearch {
             visited.add(current);
 
             for (GameState neighbor : current.getNextStates()) {
-                if (visited.contains(neighbor))
+                if (visited.contains(neighbor) || frontier.contains(neighbor))
                     continue;
 
                 boolean deadlock = false;
@@ -76,7 +74,7 @@ public class GreedyBestFirstSearch {
     }
 
     private static boolean isGoalState(GameState state, HashSet<Point> targets) {
-        return targets.equals(state.getBoxPosition());
+        return targets.containsAll(state.getBoxPosition());
     }
 
     private static List<GameState> reconstructPath(Map<GameState, GameState> cameFrom, GameState current) {
