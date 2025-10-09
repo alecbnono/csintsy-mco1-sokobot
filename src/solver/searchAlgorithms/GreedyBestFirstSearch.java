@@ -25,16 +25,16 @@ public class GreedyBestFirstSearch {
                 state -> heuristics.getStateHeuristic(state.getBoxPosition(), targetPoints, wallPoints)));
 
         Set<GameState> visited = new HashSet<>();
+        Set<GameState> frontierSet = new HashSet<>();
         Map<GameState, GameState> cameFrom = new HashMap<>();
 
         frontier.add(startState);
+        frontierSet.add(startState);
 
         while (!frontier.isEmpty()) {
             GameState current = frontier.poll();
+            frontierSet.remove(current);
 
-            // Skip if already visited
-            if (visited.contains(current))
-                continue;
             visited.add(current);
 
             // Check goal
@@ -52,8 +52,9 @@ public class GreedyBestFirstSearch {
                     continue;
 
                 // Only add to frontier if not already present
-                if (!frontier.contains(neighbor)) {
+                if (!frontierSet.contains(neighbor)) {
                     frontier.add(neighbor);
+                    frontierSet.add(neighbor);
                     cameFrom.put(neighbor, current);
                 }
             }
