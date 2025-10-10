@@ -3,6 +3,8 @@ package solver.main;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import solver.heuristics.Heuristics;
+
 public class GameState {
 
     public static final int MAX_MOVES = 4;
@@ -10,19 +12,27 @@ public class GameState {
     private Point playerPosition;
     private HashSet<Point> boxPosition;
     private LevelData level;
+    private Heuristics heuristics;
+    private int heuristicValue;
     private char move;
 
     // Constructor for next states (with move)
-    public GameState(Point playerPosition, HashSet<Point> boxPosition, LevelData level, char move) {
+    public GameState(Point playerPosition,
+            HashSet<Point> boxPosition,
+            LevelData level,
+            Heuristics heuristics,
+            char move) {
         this.playerPosition = playerPosition;
         this.boxPosition = new HashSet<>(boxPosition);
         this.level = level;
         this.move = move;
+        this.heuristics = heuristics;
+        this.heuristicValue = heuristics.totalManhattan(boxPosition, level.getTargets());
     }
 
     // Constructor for origin (no move)
-    public GameState(Point playerPosition, HashSet<Point> boxPosition, LevelData level) {
-        this(playerPosition, boxPosition, level, ' ');
+    public GameState(Point playerPosition, HashSet<Point> boxPosition, Heuristics heuristics, LevelData level) {
+        this(playerPosition, boxPosition, level, heuristics, ' ');
     }
 
     public Point getPlayer() {
@@ -33,9 +43,45 @@ public class GameState {
         return new HashSet<>(boxPosition);
     }
 
+    public boolean isDeadlock(Point position, HashSet<Point> targets, HashSet<Point> walls) {
+
+        // ignore deadlock if in target already
+        if (targets.contains(position)) {
+            return false;
+        }
+
+        // checks if box is located in a corner
+        boolean topLeft = walls.contains(position.pointAtMove('u')) && walls.contains(position.pointAtMove('l'));
+        boolean topRight = walls.contains(position.pointAtMove('u')) && walls.contains(position.pointAtMove('r'));
+        boolean bottomLeft = walls.contains(position.pointAtMove('d')) && walls.contains(position.pointAtMove('l'));
+        boolean bottomRight = walls.contains(position.pointAtMove('d')) && walls.contains(position.pointAtMove('r'));
+
+        if (topLeft || topRight || bottomLeft || bottomRight) {
+            return true;
+        }
+
+        return false;
+
+    }
+
+    // consider moves that lead to deadlocks as an invalid move
+    public boolean isStateDeadlock(HashSet<Point> boxes, HashSet<Point> targets, HashSet<Point> walls) {
+        for (Point box : boxes) {
+            if (isDeadlock(box, targets, walls)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public boolean isValidAction(char direction) {
         Point nextPoint = playerPosition.pointAtMove(direction);
         Point nextNextPoint = nextPoint.pointAtMove(direction);
+
+        if (isStateDeadlock(boxPosition, level.getTargets(), level.getWalls())) {
+            return false;
+        }
 
         if (level.getWalls().contains(nextPoint))
             return false;
@@ -59,7 +105,7 @@ public class GameState {
             HashSet<Point> newBoxPosition = new HashSet<>(boxPosition);
             newBoxPosition.remove(nextPlayerPoint);
             newBoxPosition.add(nextPlayerPoint.pointAtMove(direction));
-            return new GameState(nextPlayerPoint, newBoxPosition, level, direction);
+            return new GameState(nextPlayerPoint, newBoxPosition, level, , direction);
         } else {
             return new GameState(nextPlayerPoint, boxPosition, level, direction);
         }

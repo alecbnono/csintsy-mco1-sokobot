@@ -38,18 +38,6 @@ public class GreedyBestFirstSearch {
                 if (visited.contains(neighbor))
                     continue;
 
-                boolean deadlock = false;
-
-                for (Point box : neighbor.getBoxPosition()) {
-                    if (heuristics.isDeadlock(box, targetPoints, wallPoints)) {
-                        deadlock = true;
-                        break;
-                    }
-                }
-
-                if (deadlock)
-                    continue;
-
                 cameFrom.put(neighbor, current);
 
                 frontier.add(neighbor);
@@ -75,8 +63,8 @@ public class GreedyBestFirstSearch {
         return total;
     }
 
-    private static boolean isGoalState(GameState state, HashSet<Point> targets) {
-        return targets.equals(state.getBoxPosition());
+    private static boolean isGoalState() {
+        return;
     }
 
     private static List<GameState> reconstructPath(Map<GameState, GameState> cameFrom, GameState current) {
