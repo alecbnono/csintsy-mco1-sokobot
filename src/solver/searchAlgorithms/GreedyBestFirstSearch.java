@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-import solver.heuristics.Heuristics;
+import solver.utils.Heuristics;
 import solver.main.GameState;
 import solver.main.Point;
 
@@ -22,7 +22,7 @@ public class GreedyBestFirstSearch {
 
         // PriorityQueue sorts by heuristic value
         PriorityQueue<GameState> frontier = new PriorityQueue<>(Comparator.comparingInt(
-                state -> heuristics.getStateHeuristic(state.getBoxPosition(), targetPoints, wallPoints)));
+                state -> Heuristics.getStateHeuristic(targetPoints, wallPoints)));
 
         Set<GameState> visited = new HashSet<>();
         Set<GameState> frontierSet = new HashSet<>();
@@ -38,7 +38,7 @@ public class GreedyBestFirstSearch {
             visited.add(current);
 
             // Check goal
-            if (isGoalState(current, targetPoints)) {
+            if (isGoalState(current)) {
                 return reconstructPath(cameFrom, current);
             }
 
@@ -47,22 +47,9 @@ public class GreedyBestFirstSearch {
                 if (visited.contains(neighbor))
                     continue;
 
-<<<<<<< HEAD
                 cameFrom.put(neighbor, current);
 
                 frontier.add(neighbor);
-=======
-                // Skip deadlocked states
-                if (heuristics.isStateDeadlock(neighbor.getBoxPosition(), targetPoints, wallPoints))
-                    continue;
-
-                // Only add to frontier if not already present
-                if (!frontierSet.contains(neighbor)) {
-                    frontier.add(neighbor);
-                    frontierSet.add(neighbor);
-                    cameFrom.put(neighbor, current);
-                }
->>>>>>> 658b7202c856807d4e936fef8ba31e9de05b809a
             }
         }
 
@@ -70,29 +57,8 @@ public class GreedyBestFirstSearch {
         return Collections.emptyList();
     }
 
-<<<<<<< HEAD
-    private static int getHeuristicValue(GameState state, Heuristics heuristics, HashSet<Point> targets) {
-        int total = 0;
-
-        for (Point box : state.getBoxPosition()) {
-            int minDist = Integer.MAX_VALUE;
-
-            for (Point target : targets) {
-                int dist = heuristics.getManhattan(box, target);
-                if (dist < minDist)
-                    minDist = dist;
-            }
-            total += minDist;
-        }
-        return total;
-    }
-
-    private static boolean isGoalState() {
-        return;
-=======
-    private static boolean isGoalState(GameState state, HashSet<Point> targets) {
-        return targets.containsAll(state.getBoxPosition());
->>>>>>> 658b7202c856807d4e936fef8ba31e9de05b809a
+    private static boolean isGoalState(GameState state) {
+        return state.getHeuristicValue() == 0;
     }
 
     private static List<GameState> reconstructPath(Map<GameState, GameState> cameFrom, GameState current) {
