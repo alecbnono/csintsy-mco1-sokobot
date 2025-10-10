@@ -1,6 +1,7 @@
 package solver.utils;
 
 import java.util.HashSet;
+import solver.main.GameState;
 import solver.main.Point;
 
 public class Heuristics {
@@ -44,8 +45,8 @@ public class Heuristics {
         return total;
     }
 
-    public static int getStateHeuristic(HashSet<Point> boxes, HashSet<Point> targets) {
-        return totalManhattan(boxes, targets);
+    public static int getStateHeuristic(GameState state, HashSet<Point> targets) {
+        return totalManhattan(state.getBoxPosition(), targets);
     }
 
 }

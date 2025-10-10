@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-import solver.utils.Heuristics;
 import solver.main.GameState;
 import solver.main.Point;
+import solver.utils.Heuristics;
 
 public class GreedyBestFirstSearch {
 
@@ -21,8 +21,8 @@ public class GreedyBestFirstSearch {
         Heuristics heuristics = new Heuristics();
 
         // PriorityQueue sorts by heuristic value
-        PriorityQueue<GameState> frontier = new PriorityQueue<>(Comparator.comparingInt(
-                state -> Heuristics.getStateHeuristic(targetPoints, wallPoints)));
+        PriorityQueue<GameState> frontier = new PriorityQueue<>(
+                Comparator.comparingInt(state -> Heuristics.getStateHeuristic(state, targetPoints)));
 
         Set<GameState> visited = new HashSet<>();
         Set<GameState> frontierSet = new HashSet<>();
