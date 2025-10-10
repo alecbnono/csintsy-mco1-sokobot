@@ -37,32 +37,36 @@ public class Heuristics {
 
     public static int getStateHeuristic(GameState state, HashSet<Point> targets) {
         // Greedy assignment heuristic
-        HashSet<Point> boxes = state.getBoxPosition();
-        HashSet<Point> remainingTargets = new HashSet<>(targets);
+        HashSet<Point> boxesSet = state.getBoxPosition();
+        Point[] boxes = boxesSet.toArray(new Point[0]);
+        Point[] targetArray = targets.toArray(new Point[0]);
+        boolean[] targetUsed = new boolean[targetArray.length];
         int heuristic = 0;
 
         for (Point box : boxes) {
-            Point closestTarget = null;
-            int minDistance = Integer.MAX_VALUE;
+            int minDist = Integer.MAX_VALUE;
+            int minIndex = -1;
 
-            for (Point target : remainingTargets) {
-                int distance = getManhattan(box, target);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestTarget = target;
+            for (int i = 0; i < targetArray.length; i++) {
+                if (!targetUsed[i]) {
+                    int dist = getManhattan(box, targetArray[i]);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        minIndex = i;
+                    }
                 }
             }
 
-            if (closestTarget != null) {
-                heuristic += minDistance;
-                remainingTargets.remove(closestTarget);
+            if (minIndex != -1) {
+                heuristic += minDist;
+                targetUsed[minIndex] = true;
             }
-
         }
 
         return heuristic;
 
         // Total Manhattan Heuristics
-        // return totalManhattan(boxes, targets);
+        // return totalManhattan(boxesSet, targets);
     }
+
 }
