@@ -44,6 +44,8 @@ public class Heuristics {
         return total;
     }
 
+<<<<<<< HEAD
+=======
     // deadlocks can be determined by checking if box is in a corner
     public boolean isDeadlock(Point position, HashSet<Point> targets, HashSet<Point> walls) {
 
@@ -88,4 +90,5 @@ public class Heuristics {
 
     }
 
+>>>>>>> 658b7202c856807d4e936fef8ba31e9de05b809a
 }

@@ -47,6 +47,11 @@ public class GreedyBestFirstSearch {
                 if (visited.contains(neighbor))
                     continue;
 
+<<<<<<< HEAD
+                cameFrom.put(neighbor, current);
+
+                frontier.add(neighbor);
+=======
                 // Skip deadlocked states
                 if (heuristics.isStateDeadlock(neighbor.getBoxPosition(), targetPoints, wallPoints))
                     continue;
@@ -57,6 +62,7 @@ public class GreedyBestFirstSearch {
                     frontierSet.add(neighbor);
                     cameFrom.put(neighbor, current);
                 }
+>>>>>>> 658b7202c856807d4e936fef8ba31e9de05b809a
             }
         }
 
@@ -64,8 +70,29 @@ public class GreedyBestFirstSearch {
         return Collections.emptyList();
     }
 
+<<<<<<< HEAD
+    private static int getHeuristicValue(GameState state, Heuristics heuristics, HashSet<Point> targets) {
+        int total = 0;
+
+        for (Point box : state.getBoxPosition()) {
+            int minDist = Integer.MAX_VALUE;
+
+            for (Point target : targets) {
+                int dist = heuristics.getManhattan(box, target);
+                if (dist < minDist)
+                    minDist = dist;
+            }
+            total += minDist;
+        }
+        return total;
+    }
+
+    private static boolean isGoalState() {
+        return;
+=======
     private static boolean isGoalState(GameState state, HashSet<Point> targets) {
         return targets.containsAll(state.getBoxPosition());
+>>>>>>> 658b7202c856807d4e936fef8ba31e9de05b809a
     }
 
     private static List<GameState> reconstructPath(Map<GameState, GameState> cameFrom, GameState current) {
