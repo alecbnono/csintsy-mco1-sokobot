@@ -8,6 +8,7 @@ import solver.heuristics.Heuristics;
 public class GameState {
 
     public static final int MAX_MOVES = 4;
+    private final int cachedHashCode;
 
     private Point playerPosition;
     private HashSet<Point> boxPosition;
@@ -16,16 +17,21 @@ public class GameState {
     private int heuristicValue;
     private char move;
 
+<<<<<<< HEAD
     // Constructor for next states (with move)
     public GameState(Point playerPosition,
             HashSet<Point> boxPosition,
             LevelData level,
             Heuristics heuristics,
             char move) {
+=======
+    public GameState(Point playerPosition, HashSet<Point> boxPosition, LevelData level, char move) {
+>>>>>>> 658b7202c856807d4e936fef8ba31e9de05b809a
         this.playerPosition = playerPosition;
         this.boxPosition = new HashSet<>(boxPosition);
         this.level = level;
         this.move = move;
+<<<<<<< HEAD
         this.heuristics = heuristics;
         this.heuristicValue = heuristics.totalManhattan(boxPosition, level.getTargets());
     }
@@ -33,14 +39,29 @@ public class GameState {
     // Constructor for origin (no move)
     public GameState(Point playerPosition, HashSet<Point> boxPosition, Heuristics heuristics, LevelData level) {
         this(playerPosition, boxPosition, level, heuristics, ' ');
+=======
+        this.cachedHashCode = computeHashCode();
     }
 
-    public Point getPlayer() {
+    public GameState(Point playerPosition, HashSet<Point> boxPosition, LevelData level) {
+        this(playerPosition, boxPosition, level, ' ');
+>>>>>>> 658b7202c856807d4e936fef8ba31e9de05b809a
+    }
+
+    public Point getPlayerPosition() {
         return playerPosition;
     }
 
     public HashSet<Point> getBoxPosition() {
-        return new HashSet<>(boxPosition);
+        return boxPosition;
+    }
+
+    private int computeHashCode() {
+        int hash = playerPosition.hashCode();
+        for (Point p : boxPosition) {
+            hash = hash * 31 + p.hashCode();
+        }
+        return hash;
     }
 
     public boolean isDeadlock(Point position, HashSet<Point> targets, HashSet<Point> walls) {
@@ -87,9 +108,8 @@ public class GameState {
             return false;
 
         if (boxPosition.contains(nextPoint)) {
-            if (level.getWalls().contains(nextNextPoint) || boxPosition.contains(nextNextPoint)) {
+            if (level.getWalls().contains(nextNextPoint) || boxPosition.contains(nextNextPoint))
                 return false;
-            }
         }
 
         return true;
@@ -97,23 +117,28 @@ public class GameState {
 
     public GameState generateState(char direction) {
         Point nextPlayerPoint = playerPosition.pointAtMove(direction);
-
         if (!isValidAction(direction))
-            throw new IllegalArgumentException("(State cannot be generated) Invalid direction: " + direction);
+            throw new IllegalArgumentException("Invalid move: " + direction);
 
+        HashSet<Point> newBoxPosition = boxPosition;
         if (boxPosition.contains(nextPlayerPoint)) {
-            HashSet<Point> newBoxPosition = new HashSet<>(boxPosition);
+            newBoxPosition = new HashSet<>(boxPosition);
             newBoxPosition.remove(nextPlayerPoint);
             newBoxPosition.add(nextPlayerPoint.pointAtMove(direction));
+<<<<<<< HEAD
             return new GameState(nextPlayerPoint, newBoxPosition, level, , direction);
         } else {
             return new GameState(nextPlayerPoint, boxPosition, level, direction);
+=======
+>>>>>>> 658b7202c856807d4e936fef8ba31e9de05b809a
         }
+
+        return new GameState(nextPlayerPoint, newBoxPosition, level, direction);
     }
 
     public ArrayList<GameState> getNextStates() {
         char[] moves = { 'u', 'd', 'l', 'r' };
-        ArrayList<GameState> nextGameStates = new ArrayList<>();
+        ArrayList<GameState> nextGameStates = new ArrayList<>(4);
 
         for (char move : moves) {
             if (isValidAction(move)) {
@@ -127,13 +152,9 @@ public class GameState {
         return this.move;
     }
 
-    public Point getPlayerPosition() {
-        return playerPosition;
-    }
-
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(playerPosition, boxPosition);
+        return cachedHashCode;
     }
 
     @Override
@@ -142,7 +163,6 @@ public class GameState {
             return true;
         if (!(obj instanceof GameState))
             return false;
-
         GameState other = (GameState) obj;
         return playerPosition.equals(other.playerPosition) && boxPosition.equals(other.boxPosition);
     }

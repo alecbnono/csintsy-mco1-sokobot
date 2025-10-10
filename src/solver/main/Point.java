@@ -37,7 +37,7 @@ public class Point {
 
     @Override
     public int hashCode() {
-        return 31 * x + y; // produces fewer collisions
+        return (x << 16) | y;
     }
 
     @Override

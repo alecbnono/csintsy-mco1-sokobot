@@ -1,7 +1,6 @@
 package solver.heuristics;
 
 import java.util.HashSet;
-
 import solver.main.Point;
 
 public class Heuristics {
@@ -23,7 +22,7 @@ public class Heuristics {
     }
 
     public int minimumManhattan(Point position, HashSet<Point> targets) {
-        int minDistance = 0;
+        int minDistance = Integer.MAX_VALUE;
         for (Point target : targets) {
             int distance = getManhattan(position, target);
 
@@ -45,4 +44,51 @@ public class Heuristics {
         return total;
     }
 
+<<<<<<< HEAD
+=======
+    // deadlocks can be determined by checking if box is in a corner
+    public boolean isDeadlock(Point position, HashSet<Point> targets, HashSet<Point> walls) {
+
+        // ignore deadlock if in target already
+        if (targets.contains(position)) {
+            return false;
+        }
+
+        // checks if box is located in a corner
+        boolean topLeft = walls.contains(position.pointAtMove('u')) && walls.contains(position.pointAtMove('l'));
+        boolean topRight = walls.contains(position.pointAtMove('u')) && walls.contains(position.pointAtMove('r'));
+        boolean bottomLeft = walls.contains(position.pointAtMove('d')) && walls.contains(position.pointAtMove('l'));
+        boolean bottomRight = walls.contains(position.pointAtMove('d')) && walls.contains(position.pointAtMove('r'));
+
+        if (topLeft || topRight || bottomLeft || bottomRight) {
+            return true;
+        }
+
+        return false;
+
+    }
+
+    public boolean isStateDeadlock(HashSet<Point> boxes, HashSet<Point> targets, HashSet<Point> walls) {
+        for (Point box : boxes) {
+            if (isDeadlock(box, targets, walls)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public int getStateHeuristic(HashSet<Point> boxes, HashSet<Point> targets, HashSet<Point> walls) {
+        int distanceHeuristic = this.totalManhattan(boxes, targets);
+        boolean deadlockExists = this.isStateDeadlock(boxes, targets, walls);
+
+        if (deadlockExists) {
+            return 999999999;
+        }
+
+        return distanceHeuristic;
+
+    }
+
+>>>>>>> 658b7202c856807d4e936fef8ba31e9de05b809a
 }
