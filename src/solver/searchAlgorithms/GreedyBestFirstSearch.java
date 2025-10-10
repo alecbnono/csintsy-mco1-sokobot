@@ -47,9 +47,14 @@ public class GreedyBestFirstSearch {
                 if (visited.contains(neighbor))
                     continue;
 
-                cameFrom.put(neighbor, current);
+                // Add neighbor only if state is not visited to avoid duplicates
+                // (dont remove this again please)
+                if (!visited.contains(neighbor) && !frontierSet.contains(neighbor)) {
+                    frontier.add(neighbor);
+                    frontierSet.add(neighbor);
+                    cameFrom.put(neighbor, current);
+                }
 
-                frontier.add(neighbor);
             }
         }
 
