@@ -2,9 +2,8 @@ package solver.main;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-
-import solver.utils.Prune;
 import solver.utils.Heuristics;
+import solver.utils.Prune;
 
 public class GameState {
 
@@ -36,6 +35,16 @@ public class GameState {
         this(playerPosition, boxPosition, level, ' ');
     }
 
+    // Consturctor for incrmeental heuristic update
+    public GameState(Point playerPosition, HashSet<Point> boxPosition, LevelData level, char move, int heuristic) {
+        this.playerPosition = playerPosition;
+        this.boxPosition = new HashSet<>(boxPosition);
+        this.level = level;
+        this.move = move;
+        this.heuristicValue = heuristic;
+        this.cachedHashCode = computeHashCode();
+    }
+
     public Point getPlayerPosition() {
         return playerPosition;
     }
@@ -58,17 +67,22 @@ public class GameState {
 
     public boolean isValidAction(char direction) {
         Point nextPoint = playerPosition.pointAtMove(direction);
-        Point nextNextPoint = nextPoint.pointAtMove(direction);
 
-        if (Prune.isStateDeadlock(boxPosition, level.getTargets(), level.getWalls())) {
-            return false;
-        }
-
+        // Can't move into walls
         if (level.getWalls().contains(nextPoint))
             return false;
 
         if (boxPosition.contains(nextPoint)) {
+            Point nextNextPoint = nextPoint.pointAtMove(direction);
+            // Can't push box into wall or another box
             if (level.getWalls().contains(nextNextPoint) || boxPosition.contains(nextNextPoint))
+                return false;
+
+            // Only check for deadlocks if a box is being pushed
+            HashSet<Point> newBoxes = new HashSet<>(boxPosition);
+            newBoxes.remove(nextPoint);
+            newBoxes.add(nextNextPoint);
+            if (Prune.isStateDeadlock(newBoxes, level.getTargets(), level.getWalls()))
                 return false;
         }
 
@@ -76,26 +90,33 @@ public class GameState {
     }
 
     public GameState generateState(char direction) {
-        Point nextPlayerPoint = playerPosition.pointAtMove(direction);
         if (!isValidAction(direction))
             throw new IllegalArgumentException("Invalid move: " + direction);
 
+        Point nextPlayerPoint = playerPosition.pointAtMove(direction);
         HashSet<Point> newBoxPosition = boxPosition;
-        if (boxPosition.contains(nextPlayerPoint)) {
-            newBoxPosition = new HashSet<>(boxPosition);
-            newBoxPosition.remove(nextPlayerPoint);
-            newBoxPosition.add(nextPlayerPoint.pointAtMove(direction));
-            return new GameState(nextPlayerPoint, newBoxPosition, level, direction);
-        }
-        return new GameState(nextPlayerPoint, boxPosition, level, direction);
+        int newHeuristic = heuristicValue;
 
+        if (boxPosition.contains(nextPlayerPoint)) {
+            Point movedBoxFrom = nextPlayerPoint;
+            Point movedBoxTo = nextPlayerPoint.pointAtMove(direction);
+
+            newBoxPosition = new HashSet<>(boxPosition);
+            newBoxPosition.remove(movedBoxFrom);
+            newBoxPosition.add(movedBoxTo);
+
+            // Updatese heuristics incrementally when box is moved
+            int oldDistance = Heuristics.minimumManhattan(movedBoxFrom, level.getTargets());
+            int newDistance = Heuristics.minimumManhattan(movedBoxTo, level.getTargets());
+            newHeuristic = heuristicValue - oldDistance + newDistance;
+        }
+
+        return new GameState(nextPlayerPoint, newBoxPosition, level, direction, newHeuristic);
     }
 
     public ArrayList<GameState> getNextStates() {
-        char[] moves = { 'u', 'd', 'l', 'r' };
         ArrayList<GameState> nextGameStates = new ArrayList<>(4);
-
-        for (char move : moves) {
+        for (char move : new char[] { 'u', 'd', 'l', 'r' }) {
             if (isValidAction(move)) {
                 nextGameStates.add(generateState(move));
             }
