@@ -9,33 +9,21 @@ public class GameState {
 
     public static final int MAX_MOVES = 4;
     private final int cachedHashCode;
+    private final LevelData level;
+    private final Point playerPosition;
+    private final HashSet<Point> boxPosition;
+    private final int heuristicValue;
+    private final char move;
 
-    private LevelData level;
-
-    private Point playerPosition;
-    private HashSet<Point> boxPosition;
-    private int heuristicValue;
-    private char move;
-
-    // Constructor for next states (with move)
-    public GameState(Point playerPosition,
-            HashSet<Point> boxPosition,
-            LevelData level,
-            char move) {
-        this.playerPosition = playerPosition;
-        this.boxPosition = new HashSet<>(boxPosition);
-        this.level = level;
-        this.move = move;
-        this.heuristicValue = Heuristics.totalManhattan(boxPosition, level.getTargets());
-        this.cachedHashCode = computeHashCode();
+    public GameState(Point playerPosition, HashSet<Point> boxPosition, LevelData level, char move) {
+        this(playerPosition, boxPosition, level, move,
+                Heuristics.totalManhattan(boxPosition, level.getTargets()));
     }
 
-    // Constructor for origin (no move)
     public GameState(Point playerPosition, HashSet<Point> boxPosition, LevelData level) {
         this(playerPosition, boxPosition, level, ' ');
     }
 
-    // Consturctor for incrmeental heuristic update
     public GameState(Point playerPosition, HashSet<Point> boxPosition, LevelData level, char move, int heuristic) {
         this.playerPosition = playerPosition;
         this.boxPosition = new HashSet<>(boxPosition);
@@ -58,73 +46,62 @@ public class GameState {
     }
 
     private int computeHashCode() {
-        int hash = playerPosition.hashCode();
-        for (Point p : boxPosition) {
-            hash = hash * 31 + p.hashCode();
-        }
+        int hash = 31 * playerPosition.hashCode();
+        for (Point p : boxPosition)
+            hash = 31 * hash + p.hashCode();
         return hash;
     }
 
-    public boolean isValidAction(char direction) {
-        Point nextPoint = playerPosition.pointAtMove(direction);
-
-        // Can't move into walls
-        if (level.getWalls().contains(nextPoint))
+    public boolean isValidAction(char dir) {
+        Point next = playerPosition.pointAtMove(dir);
+        if (level.getWalls().contains(next))
             return false;
 
-        if (boxPosition.contains(nextPoint)) {
-            Point nextNextPoint = nextPoint.pointAtMove(direction);
-            // Can't push box into wall or another box
-            if (level.getWalls().contains(nextNextPoint) || boxPosition.contains(nextNextPoint))
+        if (boxPosition.contains(next)) {
+            Point nextNext = next.pointAtMove(dir);
+            if (level.getWalls().contains(nextNext) || boxPosition.contains(nextNext))
                 return false;
 
-            // Only check for deadlocks if a box is being pushed
-
-            // static deadlocks
-            if (level.getDeadlocks().contains(nextNextPoint))
+            if (level.getDeadlocks().contains(nextNext))
                 return false;
-
-            // dynamic deadlocks
-            if (Prune.isStateFrozen(this.level, boxPosition))
+            // Only check frozen states if a box is actually moved into a new cell
+            if (Prune.isStateFrozen(level, boxPosition))
                 return false;
         }
 
         return true;
     }
 
-    public GameState generateState(char direction) {
-        if (!isValidAction(direction))
-            throw new IllegalArgumentException("Invalid move: " + direction);
+    public GameState generateState(char dir) {
+        if (!isValidAction(dir))
+            throw new IllegalArgumentException("Invalid move: " + dir);
 
-        Point nextPlayerPoint = playerPosition.pointAtMove(direction);
-        HashSet<Point> newBoxPosition = boxPosition;
+        Point nextPlayer = playerPosition.pointAtMove(dir);
+        HashSet<Point> newBoxes = boxPosition;
         int newHeuristic = heuristicValue;
 
-        if (boxPosition.contains(nextPlayerPoint)) {
-            Point movedBoxFrom = nextPlayerPoint;
-            Point movedBoxTo = nextPlayerPoint.pointAtMove(direction);
+        if (boxPosition.contains(nextPlayer)) {
+            Point from = nextPlayer;
+            Point to = nextPlayer.pointAtMove(dir);
+            newBoxes = new HashSet<>(boxPosition);
+            newBoxes.remove(from);
+            newBoxes.add(to);
 
-            newBoxPosition = new HashSet<>(boxPosition);
-            newBoxPosition.remove(movedBoxFrom);
-            newBoxPosition.add(movedBoxTo);
-
-            // Updatese heuristics incrementally when box is moved
-            int oldDistance = Heuristics.minimumManhattan(movedBoxFrom, level.getTargets());
-            int newDistance = Heuristics.minimumManhattan(movedBoxTo, level.getTargets());
-            newHeuristic = heuristicValue - oldDistance + newDistance;
+            // Incremental heuristic update
+            int oldDist = Heuristics.minimumManhattan(from, level.getTargets());
+            int newDist = Heuristics.minimumManhattan(to, level.getTargets());
+            newHeuristic += newDist - oldDist;
         }
 
-        return new GameState(nextPlayerPoint, newBoxPosition, level, direction, newHeuristic);
+        return new GameState(nextPlayer, newBoxes, level, dir, newHeuristic);
     }
 
     public ArrayList<GameState> getNextStates() {
-        ArrayList<GameState> nextGameStates = new ArrayList<>(4);
-        for (char move : new char[] { 'u', 'd', 'l', 'r' }) {
-            if (isValidAction(move)) {
-                nextGameStates.add(generateState(move));
-            }
-        }
-        return nextGameStates;
+        ArrayList<GameState> states = new ArrayList<>(MAX_MOVES);
+        for (char move : new char[] { 'u', 'd', 'l', 'r' })
+            if (isValidAction(move))
+                states.add(generateState(move));
+        return states;
     }
 
     public char getMoveMadeFrom(GameState previous) {
@@ -137,13 +114,13 @@ public class GameState {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(Object o) {
+        if (this == o)
             return true;
-        if (!(obj instanceof GameState))
+        if (!(o instanceof GameState))
             return false;
-        GameState other = (GameState) obj;
-        return playerPosition.equals(other.playerPosition) && boxPosition.equals(other.boxPosition);
+        GameState g = (GameState) o;
+        return playerPosition.equals(g.playerPosition) && boxPosition.equals(g.boxPosition);
     }
 
     @Override

@@ -6,67 +6,53 @@ import solver.main.Point;
 
 public class Heuristics {
 
-    private static int getAbsoulteValue(int number) {
-        return number < 0 ? -number : number;
+    public static int getManhattan(Point a, Point b) {
+        return Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY());
     }
 
-    public static int getManhattan(Point position, Point target) {
-        int differenceInX = getAbsoulteValue(position.getX() - target.getX());
-        int differenceInY = getAbsoulteValue(position.getY() - target.getY());
-        return differenceInX + differenceInY;
-    }
-
-    public static int minimumManhattan(Point position, HashSet<Point> targets) {
-        int minDistance = Integer.MAX_VALUE;
-        for (Point target : targets) {
-            int distance = getManhattan(position, target);
-            if (distance < minDistance) {
-                minDistance = distance;
-            }
+    public static int minimumManhattan(Point box, HashSet<Point> targets) {
+        int min = Integer.MAX_VALUE;
+        for (Point t : targets) {
+            int d = getManhattan(box, t);
+            if (d < min)
+                min = d;
         }
-        return minDistance;
+        return min;
     }
 
     public static int totalManhattan(HashSet<Point> boxes, HashSet<Point> targets) {
         int total = 0;
-        for (Point box : boxes) {
-            total += minimumManhattan(box, targets);
-        }
+        for (Point b : boxes)
+            total += minimumManhattan(b, targets);
         return total;
     }
 
+    // Greedy matching heuristic — faster and cleaner
     public static int getStateHeuristic(GameState state, HashSet<Point> targets) {
-        // Greedy assignment heuristic
-        HashSet<Point> boxesSet = state.getBoxPosition();
-        Point[] boxes = boxesSet.toArray(new Point[0]);
-        Point[] targetArray = targets.toArray(new Point[0]);
-        boolean[] targetUsed = new boolean[targetArray.length];
+        Point[] boxArray = state.getBoxPosition().toArray(Point[]::new);
+        Point[] targetArray = targets.toArray(Point[]::new);
+        boolean[] used = new boolean[targetArray.length];
         int heuristic = 0;
 
-        for (Point box : boxes) {
+        for (Point box : boxArray) {
             int minDist = Integer.MAX_VALUE;
-            int minIndex = -1;
+            int bestIdx = -1;
 
             for (int i = 0; i < targetArray.length; i++) {
-                if (!targetUsed[i]) {
-                    int dist = getManhattan(box, targetArray[i]);
-                    if (dist < minDist) {
-                        minDist = dist;
-                        minIndex = i;
-                    }
+                if (used[i])
+                    continue;
+                int d = getManhattan(box, targetArray[i]);
+                if (d < minDist) {
+                    minDist = d;
+                    bestIdx = i;
                 }
             }
 
-            if (minIndex != -1) {
+            if (bestIdx >= 0) {
+                used[bestIdx] = true;
                 heuristic += minDist;
-                targetUsed[minIndex] = true;
             }
         }
-
         return heuristic;
-
-        // Total Manhattan Heuristics
-        // return totalManhattan(boxesSet, targets);
     }
-
 }
