@@ -9,27 +9,21 @@ public class SokoBot {
 
     public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
         LevelData level = new LevelData(width, height, mapData, itemsData);
+        List<GameState> solution = GreedyBestFirstSearch.GBFS(level.getOrigin());
 
-        GameState startState = level.getOrigin();
-
-        List<GameState> solution = GreedyBestFirstSearch.GBFS(startState);
-
-        StringBuilder moves = new StringBuilder();
-        for (int i = 1; i < solution.size(); i++) {
-            GameState prev = solution.get(i - 1);
-            GameState curr = solution.get(i);
-
-            char move = curr.getMoveMadeFrom(prev);
-
-            moves.append(move);
-        }
-
-        if (solution.isEmpty()) {
+        if (solution == null || solution.isEmpty()) {
             return "No solution found.";
         }
 
+        StringBuilder moves = new StringBuilder(solution.size() - 1);
+
+        GameState prev = solution.get(0);
+        for (int i = 1; i < solution.size(); i++) {
+            GameState curr = solution.get(i);
+            moves.append(curr.getMoveMadeFrom(prev));
+            prev = curr;
+        }
+
         return moves.toString();
-
     }
-
 }
