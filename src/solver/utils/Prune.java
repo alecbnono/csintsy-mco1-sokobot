@@ -1,6 +1,10 @@
 package solver.utils;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+
+import solver.main.LevelData;
 import solver.main.Point;
 
 public class Prune {
@@ -23,6 +27,36 @@ public class Prune {
         }
 
         return false;
+    }
+
+    public static HashSet<Point> reverseFloodFill(LevelData level) {
+        HashSet<Point> reachable = new HashSet<>(level.getTargets());
+        Queue<Point> queue = new LinkedList<>(level.getTargets());
+
+        while (!queue.isEmpty()) {
+            Point current = queue.poll();
+
+            for (char dir : new char[] { 'u', 'd', 'l', 'r' }) {
+                Point from = current.pointAtMove(Point.opposite(dir)); // box’s previous spot
+                Point pusher = from.pointAtMove(Point.opposite(dir)); // where player would stand
+
+                if (level.getFloors().contains(from) && level.getFloors().contains(pusher)
+                        && !reachable.contains(from)) {
+                    reachable.add(from);
+                    queue.add(from);
+                }
+            }
+        }
+
+        // Deadlocks = floor cells not reachable by reverse flood-fill
+        HashSet<Point> deadlocks = new HashSet<>();
+        for (Point floor : level.getFloors()) {
+            if (!reachable.contains(floor)) {
+                deadlocks.add(floor);
+            }
+        }
+
+        return deadlocks;
     }
 
     // consider moves that lead to deadlocks as an invalid move

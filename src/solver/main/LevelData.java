@@ -10,6 +10,7 @@ public class LevelData {
     private HashSet<Point> walls = new HashSet<>();
     private HashSet<Point> targets = new HashSet<>(); // use this to check for goal state
     private HashSet<Point> deadlocks = new HashSet<>();
+    private HashSet<Point> floors = new HashSet<>();
 
     private GameState origin;
 
@@ -30,6 +31,9 @@ public class LevelData {
                 if (mapData[i][j] == '.') {
                     targets.add(new Point(j, i));
                 }
+                if (mapData[i][j] == '.' || mapData[i][j] == ' ') {
+                    floors.add(new Point(j, i));
+                }
 
                 // Boxes and player may appear in itemsData
                 char item = itemsData[i][j];
@@ -42,6 +46,8 @@ public class LevelData {
             }
         }
 
+        deadlocks = Prune.reverseFloodFill(this);
+
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (mapData[i][j] == ' ') {
@@ -51,6 +57,22 @@ public class LevelData {
                         deadlocks.add(space);
                 }
             }
+        }
+
+        System.out.println("DEBUG: Finish Pre-computing Deadlock");
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Point p = new Point(x, y);
+                if (this.walls.contains(p))
+                    System.out.print("#");
+                else if (this.targets.contains(p))
+                    System.out.print(".");
+                else if (this.deadlocks.contains(p))
+                    System.out.print("X");
+                else
+                    System.out.print(" ");
+            }
+            System.out.println();
         }
 
         // Initialize origin state
@@ -71,6 +93,10 @@ public class LevelData {
 
     public HashSet<Point> getDeadlocks() {
         return deadlocks;
+    }
+
+    public HashSet<Point> getFloors() {
+        return floors;
     }
 
 }

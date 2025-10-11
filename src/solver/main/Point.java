@@ -35,7 +35,7 @@ public class Point {
         }
     }
 
-    public char opposite(char direction) {
+    public static char opposite(char direction) {
 
         switch (direction) {
             case 'u' -> {
