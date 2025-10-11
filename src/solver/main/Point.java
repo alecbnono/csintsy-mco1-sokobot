@@ -35,6 +35,25 @@ public class Point {
         }
     }
 
+    public char opposite(char direction) {
+
+        switch (direction) {
+            case 'u' -> {
+                return 'd';
+            }
+            case 'd' -> {
+                return 'u';
+            }
+            case 'l' -> {
+                return 'r';
+            }
+            case 'r' -> {
+                return 'l';
+            }
+            default -> throw new IllegalArgumentException("Invalid direction: " + direction);
+        }
+    }
+
     @Override
     public int hashCode() {
         return (x << 16) | y;

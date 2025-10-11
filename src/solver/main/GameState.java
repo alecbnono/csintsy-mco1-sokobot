@@ -79,7 +79,7 @@ public class GameState {
                 return false;
 
             // Only check for deadlocks if a box is being pushed
-            if (Prune.isCornerDeadlock(nextNextPoint, level.getTargets(), level.getWalls()))
+            if (level.getDeadlocks().contains(nextNextPoint))
                 return false;
         }
 

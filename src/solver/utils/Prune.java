@@ -23,20 +23,19 @@ public class Prune {
         }
 
         return false;
-
     }
 
     // consider moves that lead to deadlocks as an invalid move
-    public static boolean isStateDeadlock(HashSet<Point> boxes, HashSet<Point> targets, HashSet<Point> walls) {
+    public static boolean isStateDeadlock(Point box, HashSet<Point> targets, HashSet<Point> walls) {
 
         // corner deadlock
-        for (Point box : boxes) {
-            if (isCornerDeadlock(box, targets, walls)) {
-                return true;
-            }
-        }
+        // for (Point box : boxes) {
+        // if (isCornerDeadlock(box, targets, walls)) {
+        // return true;
+        // }
+        // }
 
-        return false;
+        return isCornerDeadlock(box, targets, walls);
     }
 
 }

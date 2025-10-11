@@ -2,11 +2,14 @@ package solver.main;
 
 import java.util.HashSet;
 
+import solver.utils.Prune;
+
 public class LevelData {
 
     // Converted data to be more memory effecient
     private HashSet<Point> walls = new HashSet<>();
     private HashSet<Point> targets = new HashSet<>(); // use this to check for goal state
+    private HashSet<Point> deadlocks = new HashSet<>();
 
     private GameState origin;
 
@@ -39,6 +42,17 @@ public class LevelData {
             }
         }
 
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                if (mapData[i][j] == ' ') {
+                    Point space = new Point(j, i);
+
+                    if (Prune.isStateDeadlock(space, targets, walls))
+                        deadlocks.add(space);
+                }
+            }
+        }
+
         // Initialize origin state
         this.origin = new GameState(tempPlayer, tempBoxPoints, this);
     }
@@ -53,6 +67,10 @@ public class LevelData {
 
     public HashSet<Point> getTargets() {
         return targets;
+    }
+
+    public HashSet<Point> getDeadlocks() {
+        return deadlocks;
     }
 
 }
