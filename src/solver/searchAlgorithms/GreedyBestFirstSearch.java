@@ -22,7 +22,7 @@ public class GreedyBestFirstSearch {
 
         // PriorityQueue sorts by heuristic value
         PriorityQueue<GameState> frontier = new PriorityQueue<>(
-                Comparator.comparingInt(state -> Heuristics.getStateHeuristic(state, targetPoints)));
+                Comparator.comparingInt(state -> state.getHeuristicValue()));
 
         Set<GameState> visited = new HashSet<>();
         Set<GameState> frontierSet = new HashSet<>();
