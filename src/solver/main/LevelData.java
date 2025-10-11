@@ -9,11 +9,17 @@ public class LevelData {
     // Converted data to be more memory effecient
     private HashSet<Point> walls = new HashSet<>();
     private HashSet<Point> targets = new HashSet<>(); // use this to check for goal state
-    private HashSet<Point> deadlocks = new HashSet<>();
+    private HashSet<Point> deadlocks;
+    private HashSet<Point> floors = new HashSet<>();
+    private int width;
+    private int height;
 
     private GameState origin;
 
     public LevelData(int width, int height, char[][] mapData, char[][] itemsData) {
+
+        this.width = width;
+        this.height = height;
 
         // temporary storage for box coords
         HashSet<Point> tempBoxPoints = new HashSet<Point>();
@@ -31,6 +37,11 @@ public class LevelData {
                     targets.add(new Point(j, i));
                 }
 
+                // floors
+                if (mapData[i][j] == '.' || mapData[i][j] == ' ') {
+                    floors.add(new Point(j, i));
+                }
+
                 // Boxes and player may appear in itemsData
                 char item = itemsData[i][j];
                 if (item == '$') {
@@ -42,6 +53,8 @@ public class LevelData {
             }
         }
 
+        this.deadlocks = new HashSet<Point>(Prune.getWallDeadlocks(this));
+
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (mapData[i][j] == ' ') {
@@ -51,6 +64,22 @@ public class LevelData {
                         deadlocks.add(space);
                 }
             }
+        }
+
+        System.out.println("DEBUG: Finish Pre-computing Deadlock");
+        for (int y = 0; y < this.height; y++) {
+            for (int x = 0; x < this.width; x++) {
+                Point p = new Point(x, y);
+                if (this.walls.contains(p))
+                    System.out.print("#");
+                else if (this.targets.contains(p))
+                    System.out.print(".");
+                else if (this.deadlocks.contains(p))
+                    System.out.print("X");
+                else
+                    System.out.print(" ");
+            }
+            System.out.println();
         }
 
         // Initialize origin state
@@ -71,6 +100,18 @@ public class LevelData {
 
     public HashSet<Point> getDeadlocks() {
         return deadlocks;
+    }
+
+    public HashSet<Point> getFloors() {
+        return floors;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getWidth() {
+        return width;
     }
 
 }
