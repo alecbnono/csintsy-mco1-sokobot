@@ -12,8 +12,7 @@ public class SokoBot {
 
         GameState startState = level.getOrigin();
 
-        List<GameState> solution = GreedyBestFirstSearch.GBFS(startState, level.getTargets(),
-                level.getWalls());
+        List<GameState> solution = GreedyBestFirstSearch.GBFS(startState);
 
         StringBuilder moves = new StringBuilder();
         for (int i = 1; i < solution.size(); i++) {
