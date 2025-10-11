@@ -79,7 +79,13 @@ public class GameState {
                 return false;
 
             // Only check for deadlocks if a box is being pushed
+
+            // static deadlocks
             if (level.getDeadlocks().contains(nextNextPoint))
+                return false;
+
+            // dynamic deadlocks
+            if (Prune.isStateFrozen(this.level, boxPosition))
                 return false;
         }
 

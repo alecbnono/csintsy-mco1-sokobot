@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import solver.main.GameState;
 import solver.main.LevelData;
 import solver.main.Point;
 
@@ -27,6 +28,26 @@ public class Prune {
         }
 
         return false;
+    }
+
+    public static boolean isStateFrozen(LevelData level, HashSet<Point> boxPositions) {
+        for (Point box : boxPositions) {
+            // check for all directions
+            for (char dir : new char[] { 'u', 'd', 'l', 'r' }) {
+                Point player = box.pointAtMove(dir); // box’s previous spot
+                Point nextPoint = box.pointAtMove(Point.opposite(dir)); // where player would stand
+
+                // check if statically reversible
+                if (level.getFloors().contains(player) &&
+                        level.getFloors().contains(nextPoint) &&
+                        // check if dynamically reversible not blocked by boxes on
+                        !boxPositions.contains(player) &&
+                        !boxPositions.contains(nextPoint)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public static HashSet<Point> reverseFloodFill(LevelData level) {

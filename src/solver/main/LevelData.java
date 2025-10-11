@@ -48,17 +48,6 @@ public class LevelData {
 
         deadlocks = Prune.reverseFloodFill(this);
 
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                if (mapData[i][j] == ' ') {
-                    Point space = new Point(j, i);
-
-                    if (Prune.isStateDeadlock(space, targets, walls))
-                        deadlocks.add(space);
-                }
-            }
-        }
-
         System.out.println("DEBUG: Finish Pre-computing Deadlock");
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
