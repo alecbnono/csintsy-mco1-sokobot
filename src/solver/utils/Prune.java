@@ -21,18 +21,18 @@ public class Prune {
                 (walls.contains(down) && walls.contains(right));
     }
 
-    public static boolean isStateFrozen(LevelData level, HashSet<Point> boxes) {
-        for (Point box : boxes) {
-            for (char dir : new char[] { 'u', 'd', 'l', 'r' }) {
-                Point player = box.pointAtMove(dir);
-                Point next = box.pointAtMove(Point.opposite(dir));
+    public static boolean isFrozen(LevelData level, HashSet<Point> boxes, Point box) {
+        for (char dir : new char[] { 'u', 'd', 'l', 'r' }) {
+            Point player = box.pointAtMove(dir);
+            Point next = box.pointAtMove(Point.opposite(dir));
 
-                if (level.getFloors().contains(player) &&
-                        level.getFloors().contains(next) &&
-                        !boxes.contains(player) &&
-                        !boxes.contains(next)) {
-                    return false;
-                }
+            // check if blocked by floors
+            if (level.getFloors().contains(player) &&
+                    level.getFloors().contains(next) &&
+                    // check if blocked by boxes
+                    !boxes.contains(player) &&
+                    !boxes.contains(next)) {
+                return false;
             }
         }
         return true;

@@ -7,8 +7,7 @@ public class GreedyBestFirstSearch {
 
     public static List<GameState> GBFS(GameState startState) {
 
-        PriorityQueue<GameState> frontier =
-                new PriorityQueue<>(Comparator.comparingInt(GameState::getHeuristicValue));
+        PriorityQueue<GameState> frontier = new PriorityQueue<>(Comparator.comparingInt(GameState::getHeuristicValue));
         Set<GameState> visited = new HashSet<>();
         Set<GameState> frontierSet = new HashSet<>();
         Map<GameState, GameState> cameFrom = new HashMap<>();

@@ -59,13 +59,18 @@ public class GameState {
 
         if (boxPosition.contains(next)) {
             Point nextNext = next.pointAtMove(dir);
+
+            // avoid pushing into walls
             if (level.getWalls().contains(nextNext) || boxPosition.contains(nextNext))
                 return false;
 
+            // static deadlock check
             if (level.getDeadlocks().contains(nextNext))
                 return false;
+
+            // dynamic deadlock check
             // Only check frozen states if a box is actually moved into a new cell
-            if (Prune.isStateFrozen(level, boxPosition))
+            if (Prune.isFrozen(level, boxPosition, next))
                 return false;
         }
 
