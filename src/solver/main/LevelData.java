@@ -59,22 +59,6 @@ public class LevelData {
             }
         }
 
-        System.out.println("DEBUG: Finish Pre-computing Deadlock");
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                Point p = new Point(x, y);
-                if (this.walls.contains(p))
-                    System.out.print("#");
-                else if (this.targets.contains(p))
-                    System.out.print(".");
-                else if (this.deadlocks.contains(p))
-                    System.out.print("X");
-                else
-                    System.out.print(" ");
-            }
-            System.out.println();
-        }
-
         // Initialize origin state
         this.origin = new GameState(tempPlayer, tempBoxPoints, this);
     }
