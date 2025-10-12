@@ -4,10 +4,19 @@ public class Point {
     private final int x, y;
     private final int cachedHash;
 
+    // Mapping indices for directions: 'u'->0, 'd'->1, 'l'->2, 'r'->3
     private static final int[] DX = { 0, 0, -1, 1 }; // u, d, l, r
     private static final int[] DY = { -1, 1, 0, 0 };
-    private static final char[] DIRS = { 'u', 'd', 'l', 'r' };
     private static final char[] OPPOSITE = { 'd', 'u', 'r', 'l' };
+
+    // ASCII lookup table for directions to index
+    private static final byte[] DIR_INDEX = new byte[128];
+    static {
+        DIR_INDEX['u'] = 0;
+        DIR_INDEX['d'] = 1;
+        DIR_INDEX['l'] = 2;
+        DIR_INDEX['r'] = 3;
+    }
 
     public Point(int x, int y) {
         this.x = x;
@@ -16,28 +25,21 @@ public class Point {
     }
 
     public int getX() {
-        return this.x;
+        return x;
     }
 
     public int getY() {
-        return this.y;
+        return y;
     }
 
     public Point pointAtMove(char direction) {
-        for (int i = 0; i < 4; i++) {
-            if (DIRS[i] == direction) {
-                return new Point(this.x + DX[i], this.y + DY[i]);
-            }
-        }
-        throw new IllegalArgumentException("Invalid direction: " + direction);
+        byte idx = DIR_INDEX[direction]; // branchless lookup
+        return new Point(this.x + DX[idx], this.y + DY[idx]);
     }
 
     public static char opposite(char direction) {
-        for (int i = 0; i < 4; i++) {
-            if (DIRS[i] == direction)
-                return OPPOSITE[i];
-        }
-        throw new IllegalArgumentException("Invalid direction: " + direction);
+        byte idx = DIR_INDEX[direction]; // branchless lookup
+        return OPPOSITE[idx];
     }
 
     @Override
