@@ -19,14 +19,14 @@ import java.util.concurrent.TimeoutException;
  * Batch test runner for Sokoban solver.
  *
  * Scans the maps/ folder and runs the solver per map with a 10s timeout.
- * Prints: [#<n>] <filename> | STATUS <OK|FAILED> in <elapsed_ms>
+ * Prints: [#<n>] <filename> | STATUS <OK|TIMEOUT|FAILED|NOSOLN> in <elapsed_ms>
  */
 public class SokobanBatchTest {
 
     public static class TestResult {
         public final String filename; // file name
         public final long elapsed;    // time taken in milliseconds
-        public final String status;   // OK / FAILED
+        public final String status;   // OK / TIMEOUT / FAILED / NOSOLN
 
         public TestResult(String filename, long elapsed, String status) {
             this.filename = filename;
@@ -46,7 +46,7 @@ public class SokobanBatchTest {
         long startNs = System.nanoTime();
         try {
             Callable<String> task = () -> {
-                // Read and normalize map file into tile grid
+                // Taken from @/gui/GamePanel.loadMap
                 List<String> lines = readAllLines(mapFile);
                 int rows = lines.size();
                 int columns = lines.stream().mapToInt(String::length).max().orElse(0);
@@ -59,7 +59,6 @@ public class SokobanBatchTest {
                     }
                 }
 
-                // Split tiles into map (walls/goals) and items (player/boxes), mirroring GamePanel.loadMap
                 char[][] map = new char[rows][columns];
                 char[][] items = new char[rows][columns];
                 int playerCount = 0;
@@ -100,7 +99,7 @@ public class SokobanBatchTest {
                                 boxCount++;
                                 goalCount++;
                                 break;
-                            case ' ': // fallthrough
+                            case ' ':
                             default:
                                 map[i][j] = ' ';
                                 items[i][j] = ' ';
@@ -109,13 +108,11 @@ public class SokobanBatchTest {
                     }
                 }
 
-                // Basic validity (same as GUI checks): one player, equal boxes and goals, at least one box
                 if (!(playerCount == 1 && boxCount == goalCount && boxCount > 0)) {
                     return "No solution found."; // treat invalid maps as unsolved
                 }
 
                 SokoBot bot = new SokoBot();
-                // Width is columns, height is rows (matches BotThread usage)
                 return bot.solveSokobanPuzzle(columns, rows, map, items);
             };
 
@@ -123,7 +120,6 @@ public class SokobanBatchTest {
             String result = future.get(30, TimeUnit.SECONDS);
             long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs);
 
-            // Consider success if solver returned a non-empty sequence that's not the "No solution" sentinel
             boolean solved = result != null && !result.trim().isEmpty() && !"No solution found.".equals(result);
             return new TestResult(filename, elapsedMs, solved ? "OK" : "NOSOLN");
 
@@ -134,7 +130,6 @@ public class SokobanBatchTest {
             long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs);
             return new TestResult(filename, elapsedMs, "FAILED");
         } finally {
-            // no-op; executor managed at class level
             exec.shutdownNow();
 
         }
@@ -172,11 +167,9 @@ public class SokobanBatchTest {
             testNum++;
         }
 
-        // Print results in bulk
         for (String line : lines) {
             System.out.println(line);
         }
-        // Summary line
         System.out.printf("Summary: %d total | %d OK | %d FAILED%n", lines.size(), okCount, failCount);
     }
 }
