@@ -1,11 +1,18 @@
 package solver.main;
 
 public class Point {
-    private int x, y;
+    private final int x, y;
+    private final int cachedHash;
+
+    private static final int[] DX = { 0, 0, -1, 1 }; // u, d, l, r
+    private static final int[] DY = { -1, 1, 0, 0 };
+    private static final char[] DIRS = { 'u', 'd', 'l', 'r' };
+    private static final char[] OPPOSITE = { 'd', 'u', 'r', 'l' };
 
     public Point(int x, int y) {
         this.x = x;
         this.y = y;
+        this.cachedHash = (x << 16) | y;
     }
 
     public int getX() {
@@ -17,56 +24,35 @@ public class Point {
     }
 
     public Point pointAtMove(char direction) {
-
-        switch (direction) {
-            case 'u' -> {
-                return new Point(this.x, this.y - 1);
+        for (int i = 0; i < 4; i++) {
+            if (DIRS[i] == direction) {
+                return new Point(this.x + DX[i], this.y + DY[i]);
             }
-            case 'd' -> {
-                return new Point(this.x, this.y + 1);
-            }
-            case 'l' -> {
-                return new Point(this.x - 1, this.y);
-            }
-            case 'r' -> {
-                return new Point(this.x + 1, this.y);
-            }
-            default -> throw new IllegalArgumentException("Invalid direction: " + direction);
         }
+        throw new IllegalArgumentException("Invalid direction: " + direction);
     }
 
     public static char opposite(char direction) {
-
-        switch (direction) {
-            case 'u' -> {
-                return 'd';
-            }
-            case 'd' -> {
-                return 'u';
-            }
-            case 'l' -> {
-                return 'r';
-            }
-            case 'r' -> {
-                return 'l';
-            }
-            default -> throw new IllegalArgumentException("Invalid direction: " + direction);
+        for (int i = 0; i < 4; i++) {
+            if (DIRS[i] == direction)
+                return OPPOSITE[i];
         }
+        throw new IllegalArgumentException("Invalid direction: " + direction);
     }
 
     @Override
     public int hashCode() {
-        return (x << 16) | y;
+        return cachedHash;
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
-            return true; // same reference
-        if (obj == null || getClass() != obj.getClass())
-            return false; // null or diff type
-        Point other = (Point) obj;
-        return this.x == other.x && this.y == other.y; // compare fields
+            return true;
+        if (!(obj instanceof Point))
+            return false;
+        Point o = (Point) obj;
+        return this.x == o.x && this.y == o.y;
     }
 
     @Override
