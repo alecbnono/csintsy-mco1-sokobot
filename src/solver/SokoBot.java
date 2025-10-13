@@ -3,13 +3,15 @@ package solver;
 import java.util.List;
 import solver.main.GameState;
 import solver.main.LevelData;
-import solver.searchAlgorithms.GreedyBestFirstSearch;
+import solver.searchAlgorithms.AstarAlgorithm;
 
 public class SokoBot {
 
     public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
         LevelData level = new LevelData(width, height, mapData, itemsData);
-        List<GameState> solution = GreedyBestFirstSearch.GBFS(level.getOrigin());
+        AstarAlgorithm astar = new AstarAlgorithm();
+        List<GameState> solution = astar.AstarSearch(level.getOrigin());
+
 
         if (solution == null || solution.isEmpty()) {
             return "No solution found.";
