@@ -45,10 +45,6 @@ public class GameState {
         return heuristicValue;
     }
 
-    public LevelData getLevel() {
-        return level;
-    }
-
     private int computeHashCode() {
         int hash = 31 * playerPosition.hashCode();
         for (Point p : boxPosition)
