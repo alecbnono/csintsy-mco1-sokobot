@@ -11,31 +11,42 @@ public class GreedyBestFirstSearch {
     Set<GameState> visited = new HashSet<>();
     Set<GameState> frontierSet = new HashSet<>();
     Map<GameState, GameState> cameFrom = new HashMap<>();
+    Map<GameState, Integer> frontierHeuristic = new HashMap<>();
 
     frontier.add(startState);
     frontierSet.add(startState);
+    frontierHeuristic.put(startState, startState.getHeuristicValue());
 
     while (!frontier.isEmpty()) {
       GameState current = frontier.poll();
       frontierSet.remove(current);
+      frontierHeuristic.remove(current);
 
       if (current.getHeuristicValue() == 0) {
-        List<GameState> solution = reconstructPath(cameFrom, current);
-        // Log visited nodes and depth
-        System.out.println("visited nodes: " + visited.size());
-        System.out.println("depth: " + (solution.size() - 1));
-        return solution;
+        return reconstructPath(cameFrom, current);
       }
 
       visited.add(current);
 
       for (GameState neighbor : current.getNextStates()) {
-        if (visited.contains(neighbor) || frontierSet.contains(neighbor))
+        if (visited.contains(neighbor))
           continue;
 
-        frontier.add(neighbor);
-        frontierSet.add(neighbor);
-        cameFrom.put(neighbor, current);
+        int h = neighbor.getHeuristicValue();
+
+        if (frontierSet.contains(neighbor)) {
+          if (h < frontierHeuristic.get(neighbor)) {
+            frontier.remove(neighbor);
+            frontier.add(neighbor);
+            frontierHeuristic.put(neighbor, h);
+            cameFrom.put(neighbor, current);
+          }
+        } else {
+          frontier.add(neighbor);
+          frontierSet.add(neighbor);
+          frontierHeuristic.put(neighbor, h);
+          cameFrom.put(neighbor, current);
+        }
       }
     }
 
