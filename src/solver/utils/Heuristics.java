@@ -27,6 +27,19 @@ public class Heuristics {
     return total;
   }
 
+  public static int[][] precomputeManhattan(HashSet<Point> boxes, HashSet<Point> targets) {
+    Point[] boxArray = boxes.toArray(Point[]::new);
+    Point[] targetArray = targets.toArray(Point[]::new);
+
+    int[][] manhattan = new int[boxArray.length][targetArray.length];
+    for (int i = 0; i < boxArray.length; i++) {
+      for (int j = 0; j < targetArray.length; j++) {
+        manhattan[i][j] = getManhattan(boxArray[i], targetArray[j]);
+      }
+    }
+    return manhattan;
+  }
+
   // Greedy matching heuristic — faster and cleaner
   public static int getStateHeuristic(GameState state, HashSet<Point> targets) {
     Point[] boxArray = state.getBoxPosition().toArray(Point[]::new);
@@ -59,6 +72,10 @@ public class Heuristics {
   public static int divideAndConquerHeuristic(HashSet<Point> boxes, HashSet<Point> targets, int groupSize) {
     Point[] boxArray = boxes.toArray(Point[]::new);
     Point[] targetArray = targets.toArray(Point[]::new);
+
+    // Precompute Manhattan distances
+    int[][] manhattan = precomputeManhattan(boxes, targets);
+
     boolean[] usedGlobal = new boolean[targetArray.length];
     int heuristic = 0;
 
@@ -67,14 +84,13 @@ public class Heuristics {
       boolean[] usedLocal = new boolean[targetArray.length];
 
       for (int i = start; i < end; i++) {
-        Point box = boxArray[i];
         int minDist = Integer.MAX_VALUE;
         int bestIdx = -1;
 
         for (int j = 0; j < targetArray.length; j++) {
           if (usedGlobal[j] || usedLocal[j])
             continue;
-          int d = getManhattan(box, targetArray[j]);
+          int d = manhattan[i][j]; // use precomputed distance
           if (d < minDist) {
             minDist = d;
             bestIdx = j;
