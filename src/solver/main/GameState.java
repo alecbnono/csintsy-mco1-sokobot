@@ -92,10 +92,7 @@ public class GameState {
       newBoxes.remove(from);
       newBoxes.add(to);
 
-      // incremental heuristic update
-      int oldContribution = Heuristics.minimumManhattan(from, level.getTargets());
-      int newContribution = Heuristics.minimumManhattan(to, level.getTargets());
-      newHeuristic = Heuristics.totalManhattan(newBoxes, level.getTargets());
+      newHeuristic = Heuristics.divideAndConquerHeuristic(newBoxes, level.getTargets(), 3);
     }
 
     return new GameState(nextPlayer, newBoxes, level, dir, newHeuristic);
