@@ -17,7 +17,7 @@ public class GameState {
 
   public GameState(Point playerPosition, HashSet<Point> boxPosition, LevelData level, char move) {
     this(playerPosition, boxPosition, level, move,
-        Heuristics.totalManhattan(boxPosition, level.getTargets()));
+        Heuristics.divideAndConquerHeuristic(boxPosition, level.getTargets(), 3));
   }
 
   public GameState(Point playerPosition, HashSet<Point> boxPosition, LevelData level) {
@@ -93,9 +93,7 @@ public class GameState {
       newBoxes.add(to);
 
       // Incremental heuristic update
-      int oldDist = Heuristics.minimumManhattan(from, level.getTargets());
-      int newDist = Heuristics.minimumManhattan(to, level.getTargets());
-      newHeuristic += newDist - oldDist;
+      newHeuristic = Heuristics.divideAndConquerHeuristic(newBoxes, level.getTargets(), 3);
     }
 
     return new GameState(nextPlayer, newBoxes, level, dir, newHeuristic);
