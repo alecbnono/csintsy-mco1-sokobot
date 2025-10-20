@@ -22,7 +22,6 @@ public class Prune {
   }
 
   public static boolean isFrozen(LevelData level, HashSet<Point> boxes, Point box) {
-    for (char dir : new char[] { 'u', 'd', 'l', 'r' }) {
       Point player = box.pointAtMove(dir);
       Point next = box.pointAtMove(Point.opposite(dir));
 
