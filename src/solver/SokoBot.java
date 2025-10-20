@@ -28,7 +28,6 @@ public class SokoBot {
       prev = curr;
     }
 
-    System.out.println(moves.toString());
 
     return moves.toString();
   }
