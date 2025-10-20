@@ -7,6 +7,7 @@ import java.util.HashSet;
 import solver.main.GameState;
 import solver.main.LevelData;
 import solver.main.Point;
+import solver.utils.Prune;
 
 public class Heuristics {
 
@@ -30,7 +31,8 @@ public class Heuristics {
     HashSet<Point> deadlockFloors = level.getDeadlocks();
 
     for (Point b : boxes) {
-      if (Prune.isStateDeadlock(b, targets, level.getWalls(), boxes) || deadlockFloors.contains(b)) {
+      if (Prune.isStateDeadlock(b, targets, level.getWalls(), boxes) || deadlockFloors.contains(b)
+          || Prune.isFrozen(level, boxes, b)) {
         return Integer.MAX_VALUE;
       }
       total += minimumManhattan(b, targets);
