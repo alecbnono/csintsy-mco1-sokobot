@@ -27,7 +27,7 @@ public class Heuristics {
   public static int totalManhattan(LevelData level, HashSet<Point> boxes, HashSet<Point> targets) {
     int total = 0;
 
-    HashSet<Point> deadlockFloors = Prune.reverseFloodFill(level);
+    HashSet<Point> deadlockFloors = level.getDeadlocks();
 
     for (Point b : boxes) {
       if (Prune.isStateDeadlock(b, targets, level.getWalls(), boxes) || deadlockFloors.contains(b)) {
