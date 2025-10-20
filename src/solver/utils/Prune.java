@@ -42,6 +42,16 @@ public class Prune {
     return blockedVertically && blockedHorizontally;
   }
 
+  public static boolean isSquareDeadlock(Point box, HashSet<Point> boxes, HashSet<Point> targets,
+      HashSet<Point> walls) {
+    if (targets.contains(box))
+      return false;
+    Point right = box.pointAtMove('r');
+    Point down = box.pointAtMove('d');
+    Point diagonal = box.pointAtMove('d').pointAtMove('r');
+    return boxes.contains(right) && boxes.contains(down) && boxes.contains(diagonal);
+  }
+
   public static HashSet<Point> reverseFloodFill(LevelData level) {
     HashSet<Point> reachable = new HashSet<>(level.getTargets());
     ArrayDeque<Point> queue = new ArrayDeque<>(level.getTargets());
@@ -94,6 +104,7 @@ public class Prune {
   }
 
   public static boolean isStateDeadlock(Point box, HashSet<Point> targets, HashSet<Point> walls, HashSet<Point> boxes) {
-    return isCornerDeadlock(box, targets, walls) || isTunnelDeadlock(box, boxes, walls, targets);
+    return isCornerDeadlock(box, targets, walls) || isTunnelDeadlock(box, boxes, walls, targets)
+        || isSquareDeadlock(box, boxes, targets, walls);
   }
 }
