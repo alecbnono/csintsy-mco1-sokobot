@@ -22,19 +22,24 @@ public class Prune {
   }
 
   public static boolean isFrozen(LevelData level, HashSet<Point> boxes, Point box) {
-      Point player = box.pointAtMove(dir);
-      Point next = box.pointAtMove(Point.opposite(dir));
+    // If the box is already on a target, it’s not frozen
+    if (level.getTargets().contains(box))
+      return false;
 
-      // check if blocked by floors
-      if (level.getFloors().contains(player) &&
-          level.getFloors().contains(next) &&
-          // check if blocked by boxes
-          !boxes.contains(player) &&
-          !boxes.contains(next)) {
-        return false;
-      }
-    }
-    return true;
+    // Check vertical immobility
+    Point up = box.pointAtMove('u');
+    Point down = box.pointAtMove('d');
+    boolean blockedVertically = (level.getWalls().contains(up) || boxes.contains(up)) &&
+        (level.getWalls().contains(down) || boxes.contains(down));
+
+    // Check horizontal immobility
+    Point left = box.pointAtMove('l');
+    Point right = box.pointAtMove('r');
+    boolean blockedHorizontally = (level.getWalls().contains(left) || boxes.contains(left)) &&
+        (level.getWalls().contains(right) || boxes.contains(right));
+
+    // If both vertical and horizontal blocked, box is frozen
+    return blockedVertically && blockedHorizontally;
   }
 
   public static HashSet<Point> reverseFloodFill(LevelData level) {
