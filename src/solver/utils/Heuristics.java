@@ -1,5 +1,8 @@
 package solver.utils;
 
+import java.util.PriorityQueue;
+import java.util.Comparator;
+
 import java.util.HashSet;
 import solver.main.GameState;
 import solver.main.Point;
@@ -44,38 +47,38 @@ public class Heuristics {
     Point[] boxArray = boxes.toArray(Point[]::new);
     Point[] targetArray = targets.toArray(Point[]::new);
 
-    // Precompute Manhattan distances
     int[][] manhattan = precomputeManhattan(boxes, targets);
-
-    boolean[] usedGlobal = new boolean[targetArray.length];
+    boolean[] targetUsed = new boolean[targetArray.length];
     int heuristic = 0;
 
-    for (int start = 0; start < boxArray.length; start += groupSize) {
-      int end = Math.min(start + groupSize, boxArray.length);
-      boolean[] usedLocal = new boolean[targetArray.length];
+    for (int i = 0; i < boxArray.length; i++) {
+      int minDist = Integer.MAX_VALUE;
+      int bestIdx = -1;
 
-      for (int i = start; i < end; i++) {
-        int minDist = Integer.MAX_VALUE;
-        int bestIdx = -1;
+      for (int j = 0; j < targetArray.length; j++) {
+        if (targetUsed[j])
+          continue;
 
-        for (int j = 0; j < targetArray.length; j++) {
-          if (usedGlobal[j] || usedLocal[j])
-            continue;
-          int d = manhattan[i][j]; // use precomputed distance
-          if (d < minDist) {
-            minDist = d;
-            bestIdx = j;
-          }
+        int manhattanDistance = manhattan[i][j];
+
+        if (manhattanDistance == Integer.MAX_VALUE)
+          continue;
+
+        if (manhattanDistance < minDist) {
+          minDist = manhattanDistance;
+          bestIdx = j;
         }
+      }
 
-        if (bestIdx >= 0) {
-          usedLocal[bestIdx] = true;
-          usedGlobal[bestIdx] = true;
-          heuristic += minDist;
-        }
+      if (bestIdx >= 0) {
+        targetUsed[bestIdx] = true;
+        heuristic += minDist;
+      } else {
+        return Integer.MAX_VALUE;
       }
     }
 
     return heuristic;
   }
+
 }
