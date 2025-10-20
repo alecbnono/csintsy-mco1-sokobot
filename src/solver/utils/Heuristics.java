@@ -5,6 +5,7 @@ import java.util.Comparator;
 
 import java.util.HashSet;
 import solver.main.GameState;
+import solver.main.LevelData;
 import solver.main.Point;
 
 public class Heuristics {
@@ -23,10 +24,17 @@ public class Heuristics {
     return min;
   }
 
-  public static int totalManhattan(HashSet<Point> boxes, HashSet<Point> targets) {
+  public static int totalManhattan(LevelData level, HashSet<Point> boxes, HashSet<Point> targets) {
     int total = 0;
-    for (Point b : boxes)
+
+    HashSet<Point> deadlockFloors = Prune.reverseFloodFill(level);
+
+    for (Point b : boxes) {
+      if (Prune.isStateDeadlock(b, targets, level.getWalls(), boxes) || deadlockFloors.contains(b)) {
+        return Integer.MAX_VALUE;
+      }
       total += minimumManhattan(b, targets);
+    }
     return total;
   }
 
