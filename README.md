@@ -62,7 +62,7 @@ src/
 
 #### `GameState.java`
 
-Defines the current state of the game:
+**Defines the current state of the game:**
 
 - Player position (`Point`)
 - Box positions (`HashSet<Point>`)
@@ -70,31 +70,31 @@ Defines the current state of the game:
 - Cached heuristic values for fast lookup
 - Functions to generate valid moves and compute successor states
 
-Heuristics are precomputed using:
+**Heuristics are precomputed using:**
 
 ```java
 Heuristics.hungarianHeuristic(level, boxPositions, level.getTargets());
-
-LevelData.java
-
-Handles map parsing and initialization:
-
-Loads walls, floors, targets, boxes, and player position
-
-Identifies deadlock cells using reverse flood fill (Prune.reverseFloodFill)
-
-Generates the origin state for the solver
-
-Point.java
-
-Lightweight coordinate representation supporting:
-
-Directional movement (u, d, l, r)
-
-Branchless lookup tables for performance
-
-Precomputed hash codes for fast comparisons
 ```
+
+#### `LevelData.java`
+
+**Handles map parsing and initialization:**
+
+- Loads walls, floors, targets, boxes, and player position
+
+- Identifies deadlock cells using reverse flood fill (Prune.reverseFloodFill)
+
+- Generates the origin state for the solver
+
+#### `Point.java`
+
+**Lightweight coordinate representation supporting:**
+
+- Directional movement (u, d, l, r)
+
+- Branchless lookup tables for performance
+
+- Precomputed hash codes for fast comparisons
 
 ### Search Algorithms
 
